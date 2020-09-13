@@ -15,6 +15,10 @@ public class HillCreator : MonoBehaviour
     [SerializeField]
     BezierCurveCreator landingSlopeCreator;
     private float takeOffHeight;
+    
+    private float Kpoint;
+    private float hillSizePoint;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +43,22 @@ public class HillCreator : MonoBehaviour
 
     public void SetTakeOffHeight(float newTakeOffHeight) {
         takeOffHeight = newTakeOffHeight;
+    }
+
+    public float GetKPoint() {
+        return Kpoint;
+    }
+
+    public void SetKPoint(float newKPoint) {
+        Kpoint = newKPoint;
+    }
+
+    public float GetHillSizePoint() {
+        return hillSizePoint;
+    }
+
+    public void SetHillSizePoint(float newHillSize) {
+        hillSizePoint = newHillSize;
     }
 
     public void CreateHill() {

@@ -16,6 +16,8 @@ public class HillCreatorEditor : Editor
         hillCreator.SetTakeOffHeight(takeOffHeight);
         hillCreator.SetNewLandingSlopePosition();
 
+        float Kpoint = EditorGUILayout.FloatField("K point", hillCreator.GetKPoint());
+        hillCreator.SetKPoint(Kpoint);
 
         if(GUILayout.Button("Create hill")) {
             hillCreator.CreateHill();
