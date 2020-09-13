@@ -22,7 +22,7 @@ public class RunningUpState : SkiJumperState
         }
     }
 
-    public override void PhysicsUpdate()
-    {
+    public override void PhysicsUpdate() {
+        playerRb.AddForce(Vector2.right * 10 * playerRb.drag, ForceMode2D.Force);
     }
 }
