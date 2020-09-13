@@ -12,6 +12,11 @@ public class HillCreatorEditor : Editor
 
         DrawDefaultInspector();
 
+        float takeOffHeight = EditorGUILayout.FloatField("Take-off Height", hillCreator.GetTakeOffHeight());
+        hillCreator.SetTakeOffHeight(takeOffHeight);
+        hillCreator.SetNewLandingSlopePosition();
+
+
         if(GUILayout.Button("Create hill")) {
             hillCreator.CreateHill();
         }
@@ -61,7 +66,7 @@ public class HillCreatorEditor : Editor
         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
         // Landing slope section
-        EditorGUILayout.LabelField("Inrun:");
+        EditorGUILayout.LabelField("Landing slope:");
         EditorGUILayout.LabelField("Landing slope control points");
         
         BezierCurveCreator landingSlopeCreator = hillCreator.GetLandingSlopeCreator();

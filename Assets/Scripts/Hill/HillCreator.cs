@@ -14,17 +14,31 @@ public class HillCreator : MonoBehaviour
 
     [SerializeField]
     BezierCurveCreator landingSlopeCreator;
-
+    private float takeOffHeight;
     // Start is called before the first frame update
     void Start()
     {
+        if (inrunCreator.GetControlPointsCount() < 3 && landingSlopeCreator.GetControlPointsCount() < 3) {
+            return;
+        }
         
+        Vector3 inrunLastControlPointPosition = inrunCreator.GetControlPoints()[inrunCreator.GetControlPointsCount() - 1].position;
+        Vector3 landingSlopeFirstControlPointPosition = landingSlopeCreator.GetControlPoints()[0].position;
+        takeOffHeight = (inrunLastControlPointPosition - landingSlopeFirstControlPointPosition).magnitude;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public float GetTakeOffHeight() {
+        return takeOffHeight;
+    }
+
+    public void SetTakeOffHeight(float newTakeOffHeight) {
+        takeOffHeight = newTakeOffHeight;
     }
 
     public void CreateHill() {
@@ -52,6 +66,16 @@ public class HillCreator : MonoBehaviour
         return landingSlopeCreator;
     }
 
+    public void SetNewLandingSlopePosition() {
+        if (inrunCreator.GetControlPointsCount() == 0 || landingSlopeCreator.GetControlPointsCount() == 0) {
+            return;
+        }
+
+        Vector3 inrunLastControlPointPosition = inrunCreator.GetControlPoints()[inrunCreator.GetControlPointsCount() - 1].position;
+        Transform landingSlopeFirstControlPoint = landingSlopeCreator.GetControlPoints()[0];
+        landingSlopeFirstControlPoint.position = inrunLastControlPointPosition - new Vector3(0, takeOffHeight, 0);
+    }
+
     private void ConstructBezierCurveComponent(GameObject hillPart, BezierCurveCreator bezierCurveCreator) {
         BezierCurve bezierCurve = hillPart.AddComponent<BezierCurve>();
 
@@ -72,7 +96,7 @@ public class HillCreator : MonoBehaviour
         float minYpos = bezierCurve.GetBezierPoints()
                                    .OrderBy(bezierPoint => bezierPoint.y)
                                    .First().y;
-        minYpos -= 2;
+        minYpos -= takeOffHeight;
 
         upperVertices = bezierCurve.GetBezierPoints();
 
