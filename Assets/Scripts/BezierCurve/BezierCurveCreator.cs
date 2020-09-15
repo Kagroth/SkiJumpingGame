@@ -78,13 +78,14 @@ public class BezierCurveCreator : MonoBehaviour
             }
         }       
         
+        /*
         for (int i = 0; i < controlPointsCount; i++) {
             if (controlPoints[i].hasChanged) {
                 CalculateBezierCurve();
                 break;
             }
         }
-
+        */
         if (renderLine) {
             if (controlPointsCount == 2) {
                 lineRenderer.positionCount = controlPointsCount;
@@ -219,7 +220,7 @@ public class BezierCurveCreator : MonoBehaviour
         }
     }
 
-    private void CalculateBezierCurve() {
+    public void CalculateBezierCurve() {
         bezierPoints = new Vector3[loopCount];
         
         if (controlPointsCount < 2) {
@@ -241,7 +242,7 @@ public class BezierCurveCreator : MonoBehaviour
         if (lineRenderer) lineRenderer.SetPositions(bezierPoints);
     }
 
-    private void CalculateBezierCurveMagnitude() {
+    public void CalculateBezierCurveMagnitude() {
         if (controlPointsCount == 2) {
             magnitude = Vector3.Magnitude(controlPoints[1].position - controlPoints[0].position);
         }
@@ -254,6 +255,22 @@ public class BezierCurveCreator : MonoBehaviour
         else {
             magnitude = 0;
         }
+    }
+
+    public int GetIndexOfNearestBezierPoint(float magnitudeToReach) {
+        float mag = 0;
+        int indexToFind = 0;
+
+        for (int index = 0; index < bezierPoints.Length - 1; index++) {
+            mag += Vector3.Magnitude(bezierPoints[index + 1] - bezierPoints[index]);
+
+            if (mag >= magnitudeToReach) {
+                indexToFind = index + 1;
+                break;
+            } 
+        }
+
+        return indexToFind;
     }
 
     private void OnDrawGizmosHandler(bool selected) {
