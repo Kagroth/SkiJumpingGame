@@ -17,24 +17,42 @@ public class HillCreator : MonoBehaviour
     private float takeOffHeight;
     
     private float Kpoint;
+    private Vector3 KpointPos;
     private float hillSizePoint;
+    private Vector3 hillSizePointPos;
+
 
     // Start is called before the first frame update
+    private void Awake() {
+        SetNewLandingSlopePosition();  
+    }
+
     void Start()
     {
-        if (inrunCreator.GetControlPointsCount() < 3 && landingSlopeCreator.GetControlPointsCount() < 3) {
-            return;
-        }
-        
-        Vector3 inrunLastControlPointPosition = inrunCreator.GetControlPoints()[inrunCreator.GetControlPointsCount() - 1].position;
-        Vector3 landingSlopeFirstControlPointPosition = landingSlopeCreator.GetControlPoints()[0].position;
-        takeOffHeight = (inrunLastControlPointPosition - landingSlopeFirstControlPointPosition).magnitude;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        Transform[] inrunControlPoints = inrunCreator.GetControlPoints();
+
+        for (int i = 0; i < inrunCreator.GetControlPointsCount(); i++) {
+            if (inrunControlPoints[i].hasChanged) {
+                inrunCreator.CalculateBezierCurve();
+                SetNewLandingSlopePosition();
+                break;
+            }
+        }
+
+        Transform[] landingSlopeControlPoints = landingSlopeCreator.GetControlPoints();
+
+        for (int i = 0; i < landingSlopeCreator.GetControlPointsCount(); i++) {
+            if (landingSlopeControlPoints[i].hasChanged) {
+                landingSlopeCreator.CalculateBezierCurve();
+                break;
+            }
+        }
     }
 
     public float GetTakeOffHeight() {
@@ -51,6 +69,8 @@ public class HillCreator : MonoBehaviour
 
     public void SetKPoint(float newKPoint) {
         Kpoint = newKPoint;
+        int index = landingSlopeCreator.GetIndexOfNearestBezierPoint(Kpoint);
+        KpointPos = landingSlopeCreator.GetBezierPoints()[index];
     }
 
     public float GetHillSizePoint() {
@@ -59,6 +79,8 @@ public class HillCreator : MonoBehaviour
 
     public void SetHillSizePoint(float newHillSize) {
         hillSizePoint = newHillSize;
+        int index = landingSlopeCreator.GetIndexOfNearestBezierPoint(hillSizePoint);
+        hillSizePointPos = landingSlopeCreator.GetBezierPoints()[index];
     }
 
     public void CreateHill() {
@@ -182,5 +204,11 @@ public class HillCreator : MonoBehaviour
         startingPoint.transform.parent = inrun.transform;
         startingPoint.transform.position = startingPointPosition + new Vector3(0, 0.5f, 0);
         Debug.Log(startingPointPosition);
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(KpointPos, 0.5f);
+        Gizmos.DrawSphere(hillSizePointPos, 0.5f);                
     }
 }
