@@ -17,8 +17,8 @@ public class TakeOffState : SkiJumperState
     }
 
     public override void PhysicsUpdate() {
-        playerRb.AddForce(Vector3.up * 8, ForceMode2D.Impulse);
-        playerRb.AddForce(Vector3.right * 4, ForceMode2D.Impulse);
+        playerRb.AddForce(Vector3.up * Random.Range(4, 10), ForceMode2D.Impulse);
+        playerRb.AddForce(Vector3.right * Random.Range(3, 6), ForceMode2D.Impulse);
         playerStateMachine.ChangeState(playerController.flyingState);
     }
 }
