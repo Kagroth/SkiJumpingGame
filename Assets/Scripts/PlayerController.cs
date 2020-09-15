@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     public TakeOffState takeOffState;
     public FlyingState flyingState;
 
+    public LandingState landingState;
+
     private void Awake() {
         playerRb = GetComponent<Rigidbody2D>();
         startingPoint = GameObject.FindGameObjectWithTag("StartingPoint").GetComponent<Transform>();
@@ -29,6 +31,7 @@ public class PlayerController : MonoBehaviour
         runningUpState = new RunningUpState(this.gameObject, playerState);
         takeOffState = new TakeOffState(this.gameObject, playerState);
         flyingState = new FlyingState(this.gameObject, playerState);
+        landingState = new LandingState(this.gameObject, playerState);
 
         playerState.ChangeState(waitingForStart);
     }
@@ -60,8 +63,10 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.tag.Equals("LandingSlope")) {
+        if (other.gameObject.tag.Equals("LandingSlope") &&
+            playerState.CurrentState() == flyingState) {
             Instantiate(follower, other.contacts[0].point, Quaternion.identity);
+            playerState.ChangeState(landingState);
         }
     }
 }
