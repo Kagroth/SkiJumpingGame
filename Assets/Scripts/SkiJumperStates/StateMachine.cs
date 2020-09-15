@@ -12,6 +12,10 @@ public class StateMachine : MonoBehaviour
         currentState.Init();
     }
 
+    public SkiJumperState CurrentState() {
+        return currentState;
+    }
+
     public void HandleUpdate() {
         currentState.HandleUpdate();
     }
