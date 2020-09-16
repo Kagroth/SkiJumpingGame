@@ -7,9 +7,6 @@ using System.Linq;
 public class HillCreator : MonoBehaviour
 {
     [SerializeField]
-    GameObject hillTarget;
-
-    [SerializeField]
     BezierCurveCreator inrunCreator;
 
     [SerializeField]
@@ -203,7 +200,6 @@ public class HillCreator : MonoBehaviour
         startingPoint.tag = "StartingPoint";
         startingPoint.transform.parent = inrun.transform;
         startingPoint.transform.position = startingPointPosition + new Vector3(0, 0.5f, 0);
-        Debug.Log(startingPointPosition);
     }
 
     private void OnDrawGizmos() {
