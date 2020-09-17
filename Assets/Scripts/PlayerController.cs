@@ -1,16 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
+    public UnityEngine.UI.Text bestScoreText;
+    public UnityEngine.UI.Text lastScoreText;
+
+    private float bestDistance = 0;
     private Rigidbody2D playerRb;
-
-    [SerializeField]
     Transform startingPoint;
-
-    [SerializeField]
-    GameObject follower;
 
     private StateMachine playerState;
 
@@ -42,7 +42,6 @@ public class PlayerController : MonoBehaviour
         transform.position = startingPoint.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.R)) {
@@ -54,7 +53,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -1);
         playerState.HandleUpdate();
     }
 
@@ -65,8 +64,55 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.tag.Equals("LandingSlope") &&
             playerState.CurrentState() == flyingState) {
-            Instantiate(follower, other.contacts[0].point, Quaternion.identity);
             playerState.ChangeState(landingState);
+            Vector2 landedPosition = other.contacts[0].point;
+            Vector3 landedPositionV3 = new Vector3(landedPosition.x, landedPosition.y, 0);
+
+            GameObject landingSlope = GameObject.FindGameObjectWithTag("LandingSlope");
+
+            BezierCurve bc = landingSlope.GetComponent<BezierCurve>();
+
+            Vector3[] bezierPoints = bc.GetBezierPoints();
+
+            Vector3 nearestBezierPoint = bezierPoints.OrderBy(bp => Vector3.Distance(landedPositionV3, bp)).First();
+        
+            float jumpDistance = 0;
+
+            for (int index = 0; index < bezierPoints.Length - 1; index++) {
+                jumpDistance += Vector3.Magnitude(bezierPoints[index + 1] - bezierPoints[index]);
+
+                if (nearestBezierPoint == bezierPoints[index + 1])  {
+                    if (landedPositionV3.x > nearestBezierPoint.x) {
+                        jumpDistance += Vector3.Magnitude(landedPositionV3 - nearestBezierPoint);
+                    }
+                    else {
+                        jumpDistance -= Vector3.Magnitude(landedPositionV3 - nearestBezierPoint);
+                    }
+
+                    break;
+                }
+            }
+
+            jumpDistance = Mathf.Round(jumpDistance * 100) / 100; 
+            
+            float half = 0f;
+
+            if (jumpDistance % 1 >= 0.50f) {
+                half = 0.5f;
+            }
+            Debug.Log("Odleglosc skoku: " + jumpDistance);
+
+            jumpDistance = Mathf.Floor(jumpDistance);
+            jumpDistance += half;
+            
+            Debug.Log("Odleglosc skoku: " + jumpDistance);
+
+            if (jumpDistance > bestDistance) {
+                bestDistance = jumpDistance;                
+            }
+
+            lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
+            bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
         }
     }
 }
