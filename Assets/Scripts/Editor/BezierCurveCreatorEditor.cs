@@ -11,17 +11,6 @@ public class BezierCurveEditor : Editor
         BezierCurveCreator bezierCurveCreator = (BezierCurveCreator) target;
         DrawDefaultInspector();
 
-        /*
-
-        if (GUILayout.Button("Dodaj punkt kontrolny")) {
-            bezierCurve.AddControlPoint();
-        }      
-        
-        if (GUILayout.Button("Reset")) {
-            bezierCurve.ResetBezier();
-        }
-        */
-
         Transform[] controlPoints = bezierCurveCreator.GetControlPoints();
         
         EditorGUILayout.BeginVertical();
