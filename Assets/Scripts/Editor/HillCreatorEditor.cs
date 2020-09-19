@@ -111,6 +111,11 @@ public class HillCreatorEditor : Editor
         
         EditorGUILayout.EndVertical();
 
+        // Wind areas section
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
         serializedObject.ApplyModifiedProperties();
     }
 }

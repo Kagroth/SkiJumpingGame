@@ -12,6 +12,10 @@ public class HillCreator : MonoBehaviour
 
     [SerializeField]
     BezierCurveCreator landingSlopeCreator;
+
+    [SerializeField]
+    WindAreasCreator windAreasCreator;
+
     private float takeOffHeight;
     
     private float Kpoint;
@@ -48,6 +52,7 @@ public class HillCreator : MonoBehaviour
         for (int i = 0; i < landingSlopeCreator.GetControlPointsCount(); i++) {
             if (landingSlopeControlPoints[i].hasChanged) {
                 landingSlopeCreator.CalculateBezierCurve();
+                windAreasCreator.CalculateWindAreas(landingSlopeCreator);
                 break;
             }
         }
@@ -85,17 +90,20 @@ public class HillCreator : MonoBehaviour
         GameObject newHill = new GameObject();
         GameObject newHillInrun = new GameObject();
         GameObject newHillLandingSlope = new GameObject();
+        GameObject newWindAreas = new GameObject();
 
         newHill.name = "Hill";
         newHillInrun.name = "Inrun";
         newHillLandingSlope.name = "LandingSlope";
         newHillLandingSlope.tag = "LandingSlope";
+        newWindAreas.name = "WindAreas";
 
-        newHillLandingSlope.transform.parent = newHillInrun.transform.parent = newHill.transform;
+        newHillLandingSlope.transform.parent = newHillInrun.transform.parent = newWindAreas.transform.parent = newHill.transform;
 
         ConstructBezierCurveComponent(newHillInrun, inrunCreator);
         ConstructBezierCurveComponent(newHillLandingSlope, landingSlopeCreator);
         ConstructStartingPoint(newHillInrun);
+        ConstructWindAreas(newWindAreas, windAreasCreator);
     }
 
     public BezierCurveCreator GetInrunCreator() {
@@ -201,6 +209,14 @@ public class HillCreator : MonoBehaviour
         startingPoint.tag = "StartingPoint";
         startingPoint.transform.parent = inrun.transform;
         startingPoint.transform.position = startingPointPosition + new Vector3(0, 0.5f, 0);
+    }
+
+    private void ConstructWindAreas(GameObject windAreasContainer, WindAreasCreator windAreasCreator) {
+        GameObject[] windAreas = windAreasCreator.CreateWindAreas();
+
+        for (int index = 0; index < windAreas.Length; index++) {
+            windAreas[index].transform.parent = windAreasContainer.transform;
+        }
     }
 
     private void OnDrawGizmos() {
