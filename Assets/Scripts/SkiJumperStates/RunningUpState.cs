@@ -12,7 +12,7 @@ public class RunningUpState : SkiJumperState
         base.Init();
         Debug.Log("Jade");
         playerRb.isKinematic = false;
-        Vector3 direction = new Vector3(1, -1, 0);
+        Vector3 direction = new Vector3(0, -1, 0);
         playerRb.AddForce(direction * 4, ForceMode2D.Impulse);
     }
 
