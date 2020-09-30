@@ -26,6 +26,12 @@ public class HillCreator : MonoBehaviour
     [SerializeField]
     GameObject k_HsPointPrefab;
 
+    [SerializeField]
+    Material hillMaterial;
+
+    [SerializeField]
+    Sprite outrunSprite;
+
     // Start is called before the first frame update
     private void Awake() {
         SetNewLandingSlopePosition();  
@@ -92,18 +98,22 @@ public class HillCreator : MonoBehaviour
         GameObject newHill = new GameObject();
         GameObject newHillInrun = new GameObject();
         GameObject newHillLandingSlope = new GameObject();
+        GameObject outrun = new GameObject();
         GameObject newWindAreas = new GameObject();
 
         newHill.name = "Hill";
         newHillInrun.name = "Inrun";
+        newHillInrun.tag = "Inrun";
         newHillLandingSlope.name = "LandingSlope";
         newHillLandingSlope.tag = "LandingSlope";
+        outrun.name = "Outrun";
         newWindAreas.name = "WindAreas";
 
-        newHillLandingSlope.transform.parent = newHillInrun.transform.parent = newWindAreas.transform.parent = newHill.transform;
+        newHillLandingSlope.transform.parent = newHillInrun.transform.parent = outrun.transform.parent = newWindAreas.transform.parent = newHill.transform;
 
         ConstructBezierCurveComponent(newHillInrun, inrunCreator);
         ConstructBezierCurveComponent(newHillLandingSlope, landingSlopeCreator);
+        // ConstructOutrun(outrun, landingSlopeCreator);
         ConstructStartingPoint(newHillInrun);
         ConstructWindAreas(newWindAreas, windAreasCreator);
         ConstructKAndHSPoints(newHill);
@@ -186,6 +196,8 @@ public class HillCreator : MonoBehaviour
         mesh.uv = vertices.Select(vertice => new Vector2(vertice.x, vertice.y)).ToArray();
         meshFilter.mesh = mesh;
 
+        meshRenderer.sharedMaterial = hillMaterial;
+
         ConstructComponentCollider(hillPart);
     }    
 
@@ -214,6 +226,19 @@ public class HillCreator : MonoBehaviour
         startingPoint.transform.position = startingPointPosition + new Vector3(0, 0.5f, 0);
     }
 
+    private void ConstructOutrun(GameObject outrun, BezierCurveCreator landingSlopeCreator) {
+        SpriteRenderer sr = outrun.AddComponent<SpriteRenderer>();
+        
+        outrun.transform.localScale = new Vector3(20, 1, 0);
+        sr.sprite = outrunSprite;
+
+        BoxCollider2D bc = outrun.AddComponent<BoxCollider2D>();
+        int x = landingSlopeCreator.GetBezierPoints().Length;
+
+        outrun.transform.position = landingSlopeCreator.GetBezierPoints()[x - 1];
+        outrun.transform.position += new Vector3(outrun.transform.localScale.x / 2, 0, 0);
+    }
+    
     private void ConstructWindAreas(GameObject windAreasContainer, WindAreasCreator windAreasCreator) {
         GameObject[] windAreas = windAreasCreator.CreateWindAreas();
 
