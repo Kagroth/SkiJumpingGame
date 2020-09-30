@@ -23,6 +23,8 @@ public class HillCreator : MonoBehaviour
     private float hillSizePoint;
     private Vector3 hillSizePointPos;
 
+    [SerializeField]
+    GameObject k_HsPointPrefab;
 
     // Start is called before the first frame update
     private void Awake() {
@@ -104,6 +106,7 @@ public class HillCreator : MonoBehaviour
         ConstructBezierCurveComponent(newHillLandingSlope, landingSlopeCreator);
         ConstructStartingPoint(newHillInrun);
         ConstructWindAreas(newWindAreas, windAreasCreator);
+        ConstructKAndHSPoints(newHill);
     }
 
     public BezierCurveCreator GetInrunCreator() {
@@ -217,6 +220,19 @@ public class HillCreator : MonoBehaviour
         for (int index = 0; index < windAreas.Length; index++) {
             windAreas[index].transform.parent = windAreasContainer.transform;
         }
+    }
+
+    private void ConstructKAndHSPoints(GameObject hillPart) {
+        GameObject pointsContainer = new GameObject();
+        GameObject kPoint = Instantiate(k_HsPointPrefab, KpointPos, Quaternion.identity);
+        GameObject hsPoint = Instantiate(k_HsPointPrefab, hillSizePointPos, Quaternion.identity);
+    
+        pointsContainer.name = "RedPoints";
+        kPoint.name = "Kpoint";
+        hsPoint.name = "HSpoint";
+        
+        pointsContainer.transform.parent = hillPart.transform;
+        kPoint.transform.parent = hsPoint.transform.parent = pointsContainer.transform;
     }
 
     private void OnDrawGizmos() {
