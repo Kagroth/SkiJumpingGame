@@ -64,6 +64,7 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.tag.Equals("LandingSlope") &&
             playerState.CurrentState() == flyingState) {
+
             playerState.ChangeState(landingState);
             Vector2 landedPosition = other.contacts[0].point;
             Vector3 landedPositionV3 = new Vector3(landedPosition.x, landedPosition.y, 0);
@@ -95,15 +96,20 @@ public class PlayerController : MonoBehaviour
 
             jumpDistance = Mathf.Round(jumpDistance * 100) / 100; 
             
-            float half = 0f;
-
-            if (jumpDistance % 1 >= 0.50f) {
-                half = 0.5f;
+            float distanceToAdd = 0f;
+            float decimalPart = jumpDistance % 1;
+            
+            if (decimalPart >= 0.75f) {
+                distanceToAdd = 1;
             }
+            else if (decimalPart < 0.75f && decimalPart >= 0.25f) {
+                distanceToAdd = 0.5f;
+            }
+
             Debug.Log("Odleglosc skoku: " + jumpDistance);
 
             jumpDistance = Mathf.Floor(jumpDistance);
-            jumpDistance += half;
+            jumpDistance += distanceToAdd;
             
             Debug.Log("Odleglosc skoku: " + jumpDistance);
 
@@ -113,6 +119,6 @@ public class PlayerController : MonoBehaviour
 
             lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
-        }
+        }    
     }
 }
