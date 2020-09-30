@@ -9,7 +9,7 @@ public class LandingState : SkiJumperState
     }
 
     public override void Init() {
-
+        Debug.Log("Laduje");
     }
 
     public override void HandleUpdate() {
