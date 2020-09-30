@@ -22,6 +22,10 @@ public class PlayerController : MonoBehaviour
 
     public LandingState landingState;
 
+    public LandedState landedState;
+
+    public FallState fallState;
+
     private void Awake() {
         playerRb = GetComponent<Rigidbody2D>();
         startingPoint = GameObject.FindGameObjectWithTag("StartingPoint").GetComponent<Transform>();
@@ -32,6 +36,8 @@ public class PlayerController : MonoBehaviour
         takeOffState = new TakeOffState(this.gameObject, playerState);
         flyingState = new FlyingState(this.gameObject, playerState);
         landingState = new LandingState(this.gameObject, playerState);
+        landedState = new LandedState(this.gameObject, playerState);
+        fallState = new FallState(this.gameObject, playerState);
 
         playerState.ChangeState(waitingForStart);
     }
@@ -119,6 +125,14 @@ public class PlayerController : MonoBehaviour
 
             lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
+
+            playerState.ChangeState(landedState);
         }    
+    }
+
+    private void OnCollisionExit2D(Collision2D other) {
+        if (other.gameObject.tag.Equals("Inrun") && playerState.CurrentState() != flyingState) {
+            playerState.ChangeState(fallState);
+        }
     }
 }
