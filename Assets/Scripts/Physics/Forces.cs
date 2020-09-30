@@ -15,7 +15,7 @@ public class Forces
     }
 
     public static Vector3 Drag(Vector2 velocity, float area) {
-        Vector3 dragForce = velocity.magnitude * velocity.magnitude * dragCoefficient * airDensity * 0.5f * -velocity.normalized * area;
+        Vector3 dragForce = velocity.magnitude * velocity.magnitude * dragCoefficient * airDensity * 0.5f * (-velocity.normalized) * area;
 
         return dragForce;
     }
