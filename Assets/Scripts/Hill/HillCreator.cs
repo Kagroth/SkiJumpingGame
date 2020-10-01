@@ -16,6 +16,8 @@ public class HillCreator : MonoBehaviour
     [SerializeField]
     WindAreasCreator windAreasCreator;
 
+    [SerializeField]
+    GameObject idealTakeOffPoint;
     private float takeOffHeight;
     
     private float Kpoint;
@@ -115,6 +117,7 @@ public class HillCreator : MonoBehaviour
         ConstructBezierCurveComponent(newHillLandingSlope, landingSlopeCreator);
         // ConstructOutrun(outrun, landingSlopeCreator);
         ConstructStartingPoint(newHillInrun);
+        ConstructIdealTakeOffPoint(newHill);
         ConstructWindAreas(newWindAreas, windAreasCreator);
         ConstructKAndHSPoints(newHill);
     }
@@ -226,6 +229,15 @@ public class HillCreator : MonoBehaviour
         startingPoint.transform.position = startingPointPosition + new Vector3(0, 0.5f, 0);
     }
 
+    private void ConstructIdealTakeOffPoint(GameObject hillPart) {
+        GameObject idealTakeOff = new GameObject();
+
+        idealTakeOff.name = "IdealTakeOffPoint";
+        idealTakeOff.tag = "IdealTakeOffPoint";
+        idealTakeOff.transform.parent = hillPart.transform;
+        idealTakeOff.transform.position = idealTakeOffPoint.transform.position;
+    }
+    
     private void ConstructOutrun(GameObject outrun, BezierCurveCreator landingSlopeCreator) {
         SpriteRenderer sr = outrun.AddComponent<SpriteRenderer>();
         
@@ -263,7 +275,8 @@ public class HillCreator : MonoBehaviour
     private void OnDrawGizmos() {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(KpointPos, 0.5f);
-        Gizmos.DrawSphere(hillSizePointPos, 0.5f);                
+        Gizmos.DrawSphere(hillSizePointPos, 0.5f);
+        Gizmos.DrawSphere(idealTakeOffPoint.transform.position, 0.5f);                
     }
 }
 #endif

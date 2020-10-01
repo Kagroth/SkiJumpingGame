@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private float bestDistance = 0;
     private Rigidbody2D playerRb;
     Transform startingPoint;
+    Transform idealTakeOffPoint;
 
     private StateMachine playerState;
 
@@ -29,7 +30,8 @@ public class PlayerController : MonoBehaviour
     private void Awake() {
         playerRb = GetComponent<Rigidbody2D>();
         startingPoint = GameObject.FindGameObjectWithTag("StartingPoint").GetComponent<Transform>();
-
+        idealTakeOffPoint = GameObject.FindGameObjectWithTag("IdealTakeOffPoint").GetComponent<Transform>();
+        
         playerState = new StateMachine();
         waitingForStart = new WaitingForStartState(this.gameObject, playerState);
         runningUpState = new RunningUpState(this.gameObject, playerState);
