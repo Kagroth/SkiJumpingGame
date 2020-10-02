@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D playerRb;
     Transform startingPoint;
     Transform idealTakeOffPoint;
-
+    GameObject landingSlope;
     private StateMachine playerState;
 
     // All possible states of player
@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody2D>();
         startingPoint = GameObject.FindGameObjectWithTag("StartingPoint").GetComponent<Transform>();
         idealTakeOffPoint = GameObject.FindGameObjectWithTag("IdealTakeOffPoint").GetComponent<Transform>();
+        landingSlope = GameObject.FindGameObjectWithTag("LandingSlope");
         
         playerState = new StateMachine();
         waitingForStart = new WaitingForStartState(this.gameObject, playerState);
@@ -69,57 +70,69 @@ public class PlayerController : MonoBehaviour
         playerState.PhysicsUpdate();
     }
 
-    private void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.tag.Equals("LandingSlope") &&
-            playerState.CurrentState() == flyingState) {
+    public Transform GetIdealTakeOffPoint() {
+        return idealTakeOffPoint;
+    }
 
-            playerState.ChangeState(landingState);
+    private float MeasureJumpDistance(Vector3 landedPosition) {
+        BezierCurve bc = landingSlope.GetComponent<BezierCurve>();
+
+        Vector3[] bezierPoints = bc.GetBezierPoints();
+
+        Vector3 nearestBezierPoint = bezierPoints.OrderBy(bp => Vector3.Distance(landedPosition, bp)).First();
+        
+        float jumpDistance = 0;
+
+        for (int index = 0; index < bezierPoints.Length - 1; index++) {
+            jumpDistance += Vector3.Magnitude(bezierPoints[index + 1] - bezierPoints[index]);
+
+            if (nearestBezierPoint == bezierPoints[index + 1])  {
+                if (landedPosition.x > nearestBezierPoint.x) {
+                    jumpDistance += Vector3.Magnitude(landedPosition - nearestBezierPoint);
+                }
+                else {
+                    jumpDistance -= Vector3.Magnitude(landedPosition - nearestBezierPoint);
+                }
+
+                break;
+            }
+        }
+
+        jumpDistance = Mathf.Round(jumpDistance * 100) / 100; 
+            
+        float distanceToAdd = 0f;
+        float decimalPart = jumpDistance % 1;
+            
+        if (decimalPart >= 0.75f) {
+            distanceToAdd = 1;
+        }
+        else if (decimalPart < 0.75f && decimalPart >= 0.25f) {
+            distanceToAdd = 0.5f;
+        }
+
+        Debug.Log("Odleglosc skoku: " + jumpDistance);
+
+        jumpDistance = Mathf.Floor(jumpDistance);
+        jumpDistance += distanceToAdd;
+            
+        Debug.Log("Odleglosc skoku: " + jumpDistance);
+
+        return jumpDistance;
+    }
+
+    private void OnCollisionEnter2D(Collision2D other) {
+        if (playerState.CurrentState() == fallState ||
+            playerState.CurrentState() == landedState) {
+            return;
+        }
+
+        if (other.gameObject.tag.Equals("LandingSlope")) {
+            playerState.CurrentState().HandleLanding();
+
             Vector2 landedPosition = other.contacts[0].point;
             Vector3 landedPositionV3 = new Vector3(landedPosition.x, landedPosition.y, 0);
 
-            GameObject landingSlope = GameObject.FindGameObjectWithTag("LandingSlope");
-
-            BezierCurve bc = landingSlope.GetComponent<BezierCurve>();
-
-            Vector3[] bezierPoints = bc.GetBezierPoints();
-
-            Vector3 nearestBezierPoint = bezierPoints.OrderBy(bp => Vector3.Distance(landedPositionV3, bp)).First();
-        
-            float jumpDistance = 0;
-
-            for (int index = 0; index < bezierPoints.Length - 1; index++) {
-                jumpDistance += Vector3.Magnitude(bezierPoints[index + 1] - bezierPoints[index]);
-
-                if (nearestBezierPoint == bezierPoints[index + 1])  {
-                    if (landedPositionV3.x > nearestBezierPoint.x) {
-                        jumpDistance += Vector3.Magnitude(landedPositionV3 - nearestBezierPoint);
-                    }
-                    else {
-                        jumpDistance -= Vector3.Magnitude(landedPositionV3 - nearestBezierPoint);
-                    }
-
-                    break;
-                }
-            }
-
-            jumpDistance = Mathf.Round(jumpDistance * 100) / 100; 
-            
-            float distanceToAdd = 0f;
-            float decimalPart = jumpDistance % 1;
-            
-            if (decimalPart >= 0.75f) {
-                distanceToAdd = 1;
-            }
-            else if (decimalPart < 0.75f && decimalPart >= 0.25f) {
-                distanceToAdd = 0.5f;
-            }
-
-            Debug.Log("Odleglosc skoku: " + jumpDistance);
-
-            jumpDistance = Mathf.Floor(jumpDistance);
-            jumpDistance += distanceToAdd;
-            
-            Debug.Log("Odleglosc skoku: " + jumpDistance);
+            float jumpDistance = MeasureJumpDistance(landedPositionV3);
 
             if (jumpDistance > bestDistance) {
                 bestDistance = jumpDistance;                
@@ -128,8 +141,28 @@ public class PlayerController : MonoBehaviour
             lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
 
+            if (playerState.CurrentState() == flyingState) {
+                // UPADEK
+                playerState.ChangeState(fallState);
+            }
+            else if (playerState.CurrentState() == landingState) {
+                // CZY USTOI LUB UPADEK
+            }
+            else if (playerState.CurrentState() == runningUpState) {
+
+            }
+        }
+
+        if (other.gameObject.tag.Equals("LandingSlope") &&
+            playerState.CurrentState() == flyingState) {
+
             playerState.ChangeState(landedState);
-        }    
+        }
+        else if (other.gameObject.tag.Equals("LandingSlope") &&
+                 playerState.CurrentState() == flyingState) {
+            
+            playerState.ChangeState(fallState);
+        }
     }
 
     private void OnCollisionExit2D(Collision2D other) {
