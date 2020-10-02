@@ -19,6 +19,28 @@ public class FlyingState : SkiJumperState
         Debug.Log("Lecę");
     }
 
+    public override void HandleUpdate()
+    {
+        // ladowanie na 2 nogi
+        if (Input.GetKeyDown("space")) {
+            RaycastHit2D[] hits2D = Physics2D.RaycastAll(playerGameObject.transform.position, Vector2.down, 1000);
+            float hitDistance = 0;
+
+            foreach (RaycastHit2D hit in hits2D) {
+                if (hit.collider.gameObject.tag.Equals("LandingSlope")) {
+                    hitDistance = hit.distance;
+                    break;
+                }
+            }
+
+            Debug.Log("Hit distance: " + hitDistance);
+        }
+        // ladowanie telemarkiem
+        else if (Input.GetKeyDown("down")) {
+
+        }
+    }
+
     public override void PhysicsUpdate() {
         Vector3 liftForce = Forces.Lift(playerRb.velocity, bounds.y);
 
@@ -35,5 +57,9 @@ public class FlyingState : SkiJumperState
         Debug.DrawLine(playerGameObject.transform.position, playerGameObject.transform.position + dragForce, Color.red);
         Debug.DrawLine(playerGameObject.transform.position, playerGameObject.transform.position + velocity, Color.blue);
         Debug.DrawLine(playerGameObject.transform.position, playerGameObject.transform.position + gravity, Color.yellow);
+    }
+
+    public override void HandleLanding() {
+        playerStateMachine.ChangeState(playerController.fallState);
     }
 }
