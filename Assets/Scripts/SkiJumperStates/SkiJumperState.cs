@@ -11,6 +11,7 @@ public class SkiJumperState
         - Flying
         - Landing
         - Landed
+        - Fall
     */
     protected GameObject playerGameObject;
     protected StateMachine playerStateMachine;
@@ -35,5 +36,9 @@ public class SkiJumperState
 
     public virtual void PhysicsUpdate() {
 
+    }
+
+    public virtual void HandleLanding() {
+        
     }
 }
