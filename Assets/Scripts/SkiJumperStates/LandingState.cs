@@ -9,7 +9,20 @@ public class LandingState : SkiJumperState
     }
 
     public override void Init() {
-        Debug.Log("Laduje");
+        Debug.Log("Podchodze do ladowania");
+
+        RaycastHit2D[] hits2D = Physics2D.RaycastAll(playerGameObject.transform.position, Vector2.down, 1000);
+        float hitDistance = 0;
+
+        foreach (RaycastHit2D hit in hits2D) {
+            if (hit.collider.gameObject.tag.Equals("LandingSlope")) {
+                hitDistance = hit.distance;
+                break;
+            }
+        }
+
+        playerStateMachine.GetLandingData().SetDistanceToLandingSlope(hitDistance);
+        Debug.Log("Wysokość podejscia do ladowania: " + hitDistance);
     }
 
     public override void HandleUpdate() {

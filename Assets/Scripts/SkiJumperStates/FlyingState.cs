@@ -23,21 +23,13 @@ public class FlyingState : SkiJumperState
     {
         // ladowanie na 2 nogi
         if (Input.GetKeyDown("space")) {
-            RaycastHit2D[] hits2D = Physics2D.RaycastAll(playerGameObject.transform.position, Vector2.down, 1000);
-            float hitDistance = 0;
-
-            foreach (RaycastHit2D hit in hits2D) {
-                if (hit.collider.gameObject.tag.Equals("LandingSlope")) {
-                    hitDistance = hit.distance;
-                    break;
-                }
-            }
-
-            Debug.Log("Hit distance: " + hitDistance);
+            playerStateMachine.SetLandingData(LandingData.BOTH_LEGS);
+            playerStateMachine.ChangeState(playerController.landingState);
         }
         // ladowanie telemarkiem
         else if (Input.GetKeyDown("down")) {
-
+            playerStateMachine.SetLandingData(LandingData.TELEMARK);
+            playerStateMachine.ChangeState(playerController.landingState);
         }
     }
 
