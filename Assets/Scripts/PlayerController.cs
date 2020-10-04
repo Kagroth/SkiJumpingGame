@@ -126,42 +126,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (other.gameObject.tag.Equals("LandingSlope")) {
-            playerState.CurrentState().HandleLanding();
-
+        if (other.gameObject.tag.Equals("LandingSlope")) {            
             Vector2 landedPosition = other.contacts[0].point;
             Vector3 landedPositionV3 = new Vector3(landedPosition.x, landedPosition.y, 0);
+            
+            playerState.GetLandingData().SetLandingPoint(landedPositionV3);
+            playerState.CurrentState().HandleLanding();
 
             float jumpDistance = MeasureJumpDistance(landedPositionV3);
 
-            if (jumpDistance > bestDistance) {
+            if (jumpDistance > bestDistance && playerState.CurrentState() == landedState) {
                 bestDistance = jumpDistance;                
             }
 
             lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
-
-            if (playerState.CurrentState() == flyingState) {
-                // UPADEK
-                playerState.ChangeState(fallState);
-            }
-            else if (playerState.CurrentState() == landingState) {
-                // CZY USTOI LUB UPADEK
-            }
-            else if (playerState.CurrentState() == runningUpState) {
-
-            }
-        }
-
-        if (other.gameObject.tag.Equals("LandingSlope") &&
-            playerState.CurrentState() == flyingState) {
-
-            playerState.ChangeState(landedState);
-        }
-        else if (other.gameObject.tag.Equals("LandingSlope") &&
-                 playerState.CurrentState() == flyingState) {
-            
-            playerState.ChangeState(fallState);
         }
     }
 
