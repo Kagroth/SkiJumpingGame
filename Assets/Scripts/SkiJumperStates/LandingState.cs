@@ -32,4 +32,37 @@ public class LandingState : SkiJumperState
     public override void PhysicsUpdate() {
 
     }
+
+    public override void HandleLanding()
+    {
+        LandingData landingData = playerStateMachine.GetLandingData();
+        
+        float minHeight = 0;
+        float minAngle = 0;
+
+        if (landingData.GetLandingType().Equals(LandingData.BOTH_LEGS)) {
+            minHeight = LandingData.BOTH_LEGS_MIN_HEIGTH;
+            minAngle = LandingData.BOTH_LEGS_MIN_ANGLE;
+        }
+        else if (landingData.GetLandingType().Equals(LandingData.TELEMARK)) {
+            minHeight = LandingData.TELEMARK_MIN_HEIGTH;
+            minAngle = LandingData.TELEMARK_MIN_ANGLE;
+        }
+
+        /*
+            TO DO
+            OBLICZENIA DOTYCZACE KATA NACHYLENIA
+        */
+
+        SkiJumperState landingResultState = null;
+
+        if (landingData.GetDistance() > minHeight) {
+            landingResultState = playerController.landedState;
+        }
+        else {
+            landingResultState = playerController.fallState;
+        }
+
+        playerStateMachine.ChangeState(landingResultState);
+    }
 }
