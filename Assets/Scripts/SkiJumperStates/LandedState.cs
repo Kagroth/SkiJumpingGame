@@ -11,7 +11,7 @@ public class LandedState : SkiJumperState
 
     public override void Init() {
         brake = true;
-        Debug.Log("I wyladowal");
+        Debug.Log("Skok ustany - " + playerStateMachine.GetLandingData().GetLandingType());
     }
 
     public override void HandleUpdate() {
