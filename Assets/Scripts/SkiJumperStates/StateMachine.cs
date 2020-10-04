@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StateMachine : MonoBehaviour
+public class StateMachine
 {
     private GameObject controllerGameObject;
     private SkiJumperState currentState;
     
     private LandingData landingType;
+
+    public StateMachine() {
+        landingType = new LandingData();
+    }
 
     public void ChangeState(SkiJumperState stateToSet) {
         currentState = stateToSet;
@@ -21,8 +25,8 @@ public class StateMachine : MonoBehaviour
         return landingType;
     }
 
-    public void SetLandingData(string type) {
-        landingType = new LandingData(type);
+    public void SetLandingType(string type) {
+        landingType.SetLandingType(type);
     }
 
     public void HandleUpdate() {
