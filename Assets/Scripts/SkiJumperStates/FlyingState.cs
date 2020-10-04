@@ -23,12 +23,12 @@ public class FlyingState : SkiJumperState
     {
         // ladowanie na 2 nogi
         if (Input.GetKeyDown("space")) {
-            playerStateMachine.SetLandingData(LandingData.BOTH_LEGS);
+            playerStateMachine.SetLandingType(LandingData.BOTH_LEGS);
             playerStateMachine.ChangeState(playerController.landingState);
         }
         // ladowanie telemarkiem
         else if (Input.GetKeyDown("down")) {
-            playerStateMachine.SetLandingData(LandingData.TELEMARK);
+            playerStateMachine.SetLandingType(LandingData.TELEMARK);
             playerStateMachine.ChangeState(playerController.landingState);
         }
     }
