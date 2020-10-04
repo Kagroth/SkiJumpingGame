@@ -10,6 +10,7 @@ public class FallState : SkiJumperState
 
     }
     public override void Init() {
+        Debug.Log("Upadek");
         enterFallState = true;
     }
 
