@@ -2,11 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using System.Linq;
 
 [ExecuteInEditMode]
 public class HillCreator : MonoBehaviour
 {
+    [SerializeField]
+    string hillName;
+
     [SerializeField]
     BezierCurveCreator inrunCreator;
 
@@ -103,7 +107,7 @@ public class HillCreator : MonoBehaviour
         GameObject outrun = new GameObject();
         GameObject newWindAreas = new GameObject();
 
-        newHill.name = "Hill";
+        newHill.name = string.IsNullOrEmpty(hillName) ? "Hill" : hillName;
         newHillInrun.name = "Inrun";
         newHillInrun.tag = "Inrun";
         newHillLandingSlope.name = "LandingSlope";
@@ -113,6 +117,8 @@ public class HillCreator : MonoBehaviour
 
         newHillLandingSlope.transform.parent = newHillInrun.transform.parent = outrun.transform.parent = newWindAreas.transform.parent = newHill.transform;
 
+        string hillFolderGUID = AssetDatabase.CreateFolder("Assets/Meshes", newHill.name.ToString());
+        Debug.Log("New folder path: " + AssetDatabase.GUIDToAssetPath(hillFolderGUID));
         ConstructBezierCurveComponent(newHillInrun, inrunCreator);
         ConstructBezierCurveComponent(newHillLandingSlope, landingSlopeCreator);
         // ConstructOutrun(outrun, landingSlopeCreator);
@@ -200,6 +206,8 @@ public class HillCreator : MonoBehaviour
         meshFilter.mesh = mesh;
 
         meshRenderer.sharedMaterial = hillMaterial;
+
+        AssetDatabase.CreateAsset(mesh, "Assets/Meshes/" + hillPart.transform.parent.name + "/" + hillPart.name + ".asset");
 
         ConstructComponentCollider(hillPart);
     }    
