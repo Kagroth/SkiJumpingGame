@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public UnityEngine.UI.Text bestScoreText;
     public UnityEngine.UI.Text lastScoreText;
+    public UnityEngine.UI.Text landingText;
 
     private float bestDistance = 0;
     private Rigidbody2D playerRb;
@@ -59,6 +60,7 @@ public class PlayerController : MonoBehaviour
             playerState.ChangeState(waitingForStart);
             transform.position = startingPoint.position;
             transform.rotation = Quaternion.identity;
+            landingText.text = "Lądowanie:";
             return;
         }
 
@@ -134,13 +136,22 @@ public class PlayerController : MonoBehaviour
             playerState.CurrentState().HandleLanding();
 
             float jumpDistance = MeasureJumpDistance(landedPositionV3);
-
+            string landingType = "";
+            
             if (jumpDistance > bestDistance && playerState.CurrentState() == landedState) {
                 bestDistance = jumpDistance;                
             }
 
+            if (playerState.CurrentState() == landedState) {
+                landingType = playerState.GetLandingData().GetLandingType();
+            }
+            else {
+                landingType = "upadek";
+            }
+
             lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
+            landingText.text = "Lądowanie: " + landingType.ToString();
         }
     }
 
