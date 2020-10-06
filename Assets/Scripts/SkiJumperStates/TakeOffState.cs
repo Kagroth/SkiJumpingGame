@@ -19,6 +19,7 @@ public class TakeOffState : SkiJumperState
 
     public override void Init() {
         Debug.Log("Wybicie");
+        playerAnimator.SetBool("takeOff", true);
         Vector3 takeOffPos = playerGameObject.transform.position;
         Vector3 idealTakeOffPos = playerGameObject.GetComponent<PlayerController>().GetIdealTakeOffPoint().position;
 

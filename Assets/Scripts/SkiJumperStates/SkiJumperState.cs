@@ -19,11 +19,14 @@ public class SkiJumperState
     protected Rigidbody2D playerRb;
     protected PlayerController playerController;
 
+    protected Animator playerAnimator;
+
     public SkiJumperState(GameObject playerGameObjectToSet, StateMachine playerStateMachineToSet) {
         playerGameObject = playerGameObjectToSet;
         playerStateMachine = playerStateMachineToSet;
         playerRb = playerGameObject.GetComponent<Rigidbody2D>();
         playerController = playerGameObject.GetComponent<PlayerController>();
+        playerAnimator = playerGameObject.GetComponent<Animator>();
     }
 
     public virtual void Init() {

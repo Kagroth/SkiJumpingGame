@@ -58,8 +58,8 @@ public class PlayerController : MonoBehaviour
             playerRb.velocity = Vector2.zero;
             playerRb.angularVelocity = 0f;
             playerState.ChangeState(waitingForStart);
-            transform.position = startingPoint.position;
-            transform.rotation = Quaternion.identity;
+            transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
+            transform.rotation = Quaternion.Euler(0, 0, -50);
             landingText.text = "Lądowanie:";
             return;
         }
