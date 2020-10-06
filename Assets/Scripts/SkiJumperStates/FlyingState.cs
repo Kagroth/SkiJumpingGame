@@ -15,7 +15,7 @@ public class FlyingState : SkiJumperState
     {
         Debug.Log("Powierzchnia: " + playerGameObject.GetComponent<Collider2D>().bounds.size);
         xSpeed = 2;
-        bounds = playerGameObject.GetComponent<SpriteRenderer>().bounds.size;
+        bounds = playerGameObject.GetComponent<Collider2D>().bounds.size;
         Debug.Log("Lecę");
     }
 

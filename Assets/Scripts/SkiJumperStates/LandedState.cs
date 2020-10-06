@@ -25,7 +25,7 @@ public class LandedState : SkiJumperState
 
     public override void PhysicsUpdate() {
         if (brake) {
-            playerRb.AddForce(Forces.Drag(playerRb.velocity, playerGameObject.GetComponent<SpriteRenderer>().bounds.size.y) + Vector3.left);
+            playerRb.AddForce(Forces.Drag(playerRb.velocity, playerGameObject.GetComponent<Collider2D>().bounds.size.y) + Vector3.left);
         }
         else {
             playerRb.velocity = Vector3.zero;
