@@ -5,10 +5,34 @@ using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
+    public Transform rotationCenter;
+
+    [SerializeField]
+    private Transform feetBone;
+    
+    [SerializeField]
+    private Transform kneeBone;
+    
+    [SerializeField]
+    private Transform pelvisBone;
+    
+    [SerializeField]
+    private Transform skisBone;
+
     public UnityEngine.UI.Text bestScoreText;
     public UnityEngine.UI.Text lastScoreText;
     public UnityEngine.UI.Text landingText;
+    
+    public UnityEngine.UI.Text skiJumperEulerAngles;
+    public UnityEngine.UI.Text skiJumperLocalEulerAngles;
+    public UnityEngine.UI.Text feetBoneEulerAngles;
+    public UnityEngine.UI.Text feetBoneLocalEulerAngles;
 
+    public UnityEngine.UI.Text kneeBoneEulerAngles;
+    public UnityEngine.UI.Text kneeBoneLocalEulerAngles;
+    
+    public UnityEngine.UI.Text pelvisBoneEulerAngles;
+    public UnityEngine.UI.Text pelvisBoneLocalEulerAngles;
     private float bestDistance = 0;
     private Rigidbody2D playerRb;
     Transform startingPoint;
@@ -27,6 +51,9 @@ public class PlayerController : MonoBehaviour
     public LandedState landedState;
 
     public FallState fallState;
+
+    private bool rotDir = true;
+    private Quaternion target = Quaternion.Euler(0, 0, -170);
 
     private void Awake() {
         playerRb = GetComponent<Rigidbody2D>();
@@ -49,11 +76,58 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = startingPoint.position;
+        transform.position = startingPoint.position + new Vector3(0, 2f, 0);;
+        transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
     void Update()
     {
+        /*
+        Vector3 vectorToTarget = Vector3.right;
+        Vector3 rotatedVectorToTarget = Quaternion.Euler(0, 0, 180) * vectorToTarget;
+
+        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, rotatedVectorToTarget);
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * 10);
+        
+        Debug.Log("Feet bone eulerAngles: " + feetBone.rotation.eulerAngles);
+        Debug.Log("Feet bone localEulerAngles: " + feetBone.localEulerAngles);
+        
+        Debug.Log("Ski Jumper eulerAngles: " + transform.rotation.eulerAngles);
+        Debug.Log("Ski Jumper localEulerAngles: " + transform.localEulerAngles);*/
+
+        skiJumperEulerAngles.text = "SJEA: " + transform.rotation.eulerAngles.ToString();
+        skiJumperLocalEulerAngles.text = "SJLEA: " + transform.localEulerAngles.ToString();
+        feetBoneEulerAngles.text = "FBEA: " + feetBone.rotation.eulerAngles.ToString();
+        feetBoneLocalEulerAngles.text = "FBLEA: " + feetBone.localEulerAngles.ToString();
+        kneeBoneEulerAngles.text = "KBEA: " + kneeBone.rotation.eulerAngles.ToString();
+        kneeBoneLocalEulerAngles.text = "KBLEA: " + kneeBone.localEulerAngles.ToString();
+        pelvisBoneEulerAngles.text = "PBEA: " + pelvisBone.rotation.eulerAngles.ToString();
+        pelvisBoneLocalEulerAngles.text = "PBLEA: " + pelvisBone.localEulerAngles.ToString();
+
+        Debug.Log(feetBone.localRotation.eulerAngles);   
+        Debug.Log(playerRb.centerOfMass);     
+
+        float axisY = Input.GetAxisRaw("Vertical");
+        float axisX = Input.GetAxis("Horizontal");
+
+        feetBone.Rotate(0, 0, -axisX * Time.deltaTime * 100);
+        // transform.Rotate(0, 0, axisY * Time.deltaTime * 100);
+        transform.RotateAround(rotationCenter.position, Vector3.forward, Time.deltaTime * axisY * 100);
+
+        if (Input.GetKey(KeyCode.Z)) {
+            if (Mathf.Abs(kneeBone.localEulerAngles.z - 60 ) > 1f) {
+                // kneeBone.Rotate(0, 0, Time.deltaTime * 20);
+                kneeBone.localRotation = Quaternion.RotateTowards(kneeBone.localRotation, Quaternion.Euler(0, 0, 300), -Time.deltaTime * 10);
+            }
+        }
+
+        if (Input.GetKey(KeyCode.X)) {
+            if (Mathf.Abs(pelvisBone.localEulerAngles.z - 210) > 1f) {
+                pelvisBone.Rotate(0, 0, -Time.deltaTime * 20);
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.R)) {
             playerRb.velocity = Vector2.zero;
             playerRb.angularVelocity = 0f;
@@ -61,10 +135,13 @@ public class PlayerController : MonoBehaviour
             transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
             transform.rotation = Quaternion.Euler(0, 0, -50);
             landingText.text = "Lądowanie:";
+            feetBone.localRotation = Quaternion.Euler(0, 0, 90);
+            kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
+            pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
             return;
         }
 
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -1);
+        Camera.main.transform.position = new Vector3(rotationCenter.position.x, rotationCenter.position.y, -1);
         playerState.HandleUpdate();
     }
 
@@ -74,6 +151,22 @@ public class PlayerController : MonoBehaviour
 
     public Transform GetIdealTakeOffPoint() {
         return idealTakeOffPoint;
+    }
+
+    public Transform GetFeetBone() {
+        return feetBone;
+    }
+
+    public Transform GetKneeBone() {
+        return kneeBone;
+    }
+
+    public Transform GetPelvisBone() {
+        return pelvisBone;
+    }
+
+    public Transform GetSkisBone() {
+        return skisBone;
     }
 
     private float MeasureJumpDistance(Vector3 landedPosition) {
@@ -157,7 +250,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D other) {
         if (other.gameObject.tag.Equals("Inrun") && playerState.CurrentState() != flyingState) {
-            playerState.ChangeState(fallState);
+            // playerState.ChangeState(fallState);
         }
     }
 }
