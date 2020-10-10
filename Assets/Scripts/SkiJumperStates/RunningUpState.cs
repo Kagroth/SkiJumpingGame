@@ -11,13 +11,25 @@ public class RunningUpState : SkiJumperState
     {
         base.Init();
         Debug.Log("Jade");
-        playerAnimator.SetBool("runningUp", true);
+        // playerAnimator.SetBool("runningUp", true);
         playerRb.isKinematic = false;
         Vector3 direction = new Vector3(0, -1, 0);
         playerRb.AddForce(direction * 4, ForceMode2D.Impulse);
     }
 
     public override void HandleUpdate() {
+        if (Mathf.Abs(playerController.GetKneeBone().localEulerAngles.z - 60 ) > 1f) {
+            // playerController.GetKneeBone().Rotate(0, 0, Time.deltaTime * 50);
+            Transform kneeBone = playerController.GetKneeBone();
+            kneeBone.localRotation = Quaternion.RotateTowards(kneeBone.localRotation, Quaternion.Euler(0, 0, 300), -Time.deltaTime * 100);
+        }
+
+        if (Mathf.Abs(playerController.GetPelvisBone().localEulerAngles.z - 210) > 1f) {
+            // playerController.GetPelvisBone().Rotate(0, 0, -Time.deltaTime * 50);
+            Transform pelvisBone = playerController.GetPelvisBone();
+            pelvisBone.localRotation = Quaternion.RotateTowards(pelvisBone.localRotation, Quaternion.Euler(0, 0, 210), Time.deltaTime * 100);
+        }
+
         if (Input.GetKeyDown("up")) {
             playerStateMachine.ChangeState(playerController.takeOffState);
         }
