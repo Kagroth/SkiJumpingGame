@@ -26,7 +26,7 @@ public class SkiJumperState
         playerStateMachine = playerStateMachineToSet;
         playerRb = playerGameObject.GetComponent<Rigidbody2D>();
         playerController = playerGameObject.GetComponent<PlayerController>();
-        playerAnimator = playerGameObject.GetComponent<Animator>();
+        // playerAnimator = playerGameObject.GetComponent<Animator>();
     }
 
     public virtual void Init() {
