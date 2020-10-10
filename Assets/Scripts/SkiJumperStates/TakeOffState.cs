@@ -19,11 +19,9 @@ public class TakeOffState : SkiJumperState
 
     public override void Init() {
         Debug.Log("Wybicie");
-        playerAnimator.SetBool("takeOff", true);
         Vector3 takeOffPos = playerGameObject.transform.position;
         Vector3 idealTakeOffPos = playerGameObject.GetComponent<PlayerController>().GetIdealTakeOffPoint().position;
 
-        // float difference = Vector3.Distance(takeOffPos, idealTakeOffPos);
         float difference = Mathf.Abs(takeOffPos.x - idealTakeOffPos.x);
         
         takeOffStr = maxTakeOffStrength - difference;
@@ -35,16 +33,20 @@ public class TakeOffState : SkiJumperState
         Debug.Log("Róznica: " + difference);
         Debug.Log("Sila wybicia: " + takeOffStr);
         Debug.Log("Kierunek wybicia: " + takeOffDir);
+            
+        Vector3 takeOffForce = new Vector3(1, 1, 0).normalized * takeOffStr;
+        
+        playerRb.AddForce(takeOffForce, ForceMode2D.Impulse);
+
+        playerStateMachine.ChangeState(playerController.flyingState);
+
     }
 
     public override void HandleUpdate() {
-    
+      
     }
 
     public override void PhysicsUpdate() {
-        // Vector3 takeOffForce = Vector3.up * takeOffStr + Vector3.right * takeOffDir;
-        Vector3 takeOffForce = new Vector3(1, 1, 0).normalized * takeOffStr;
-        playerRb.AddForce(takeOffForce, ForceMode2D.Impulse);
-        playerStateMachine.ChangeState(playerController.flyingState);
+
     }
 }
