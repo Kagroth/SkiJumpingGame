@@ -12,8 +12,9 @@ public class WaitingForStartState : SkiJumperState
         base.Init();
         Debug.Log("Oczekuje na start");
         playerRb.isKinematic = true;
-        playerAnimator.SetBool("runningUp", false);
+        /*playerAnimator.SetBool("runningUp", false);
         playerAnimator.SetBool("takeOff", false);
+        playerAnimator.SetBool("landing", false);*/
     }
 
     public override void HandleUpdate() {
