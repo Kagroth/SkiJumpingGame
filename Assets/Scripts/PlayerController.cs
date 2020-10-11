@@ -105,8 +105,7 @@ public class PlayerController : MonoBehaviour
         pelvisBoneEulerAngles.text = "PBEA: " + pelvisBone.rotation.eulerAngles.ToString();
         pelvisBoneLocalEulerAngles.text = "PBLEA: " + pelvisBone.localEulerAngles.ToString();
 
-        Debug.Log(feetBone.localRotation.eulerAngles);   
-        Debug.Log(playerRb.centerOfMass);     
+        float angle = Vector3.Angle(feetBone.up, transform.up);
 
         float axisY = Input.GetAxisRaw("Vertical");
         float axisX = Input.GetAxis("Horizontal");
