@@ -15,6 +15,7 @@ public class FlyingState : SkiJumperState
     Transform skisBone;
 
     float bodyToSkisTilt; // nachylenie skoczka względem nart
+    float skiJumperTilt; // nachylenie skoczka względem zeskoku
  
     bool isAnimationEnter = true;
 
@@ -36,7 +37,7 @@ public class FlyingState : SkiJumperState
         bounds = playerGameObject.GetComponent<Collider2D>().bounds.size;
         Debug.Log("Lecę");
         isAnimationEnter = true;
-    }
+}
 
     public override void HandleUpdate()
     {
@@ -82,20 +83,17 @@ public class FlyingState : SkiJumperState
             playerGameObject.transform.Rotate(0, 0, axisX * Time.deltaTime * rotationSpeed);
 
             bodyToSkisTilt = feetBone.localEulerAngles.z;
+            skiJumperTilt = playerGameObject.transform.localEulerAngles.z;
 
-            if (bodyToSkisTilt > 45 && bodyToSkisTilt < 90)
+            if (bodyToSkisTilt > 60 && bodyToSkisTilt < 90)
             {
-                playerGameObject.transform.Rotate(0, 0, Time.deltaTime * rotationSpeed * bodyToSkisTilt / 4);
+                playerGameObject.transform.Rotate(0, 0, Time.deltaTime * rotationSpeed);
             }
             else if (bodyToSkisTilt < 20 || bodyToSkisTilt > 300)
             {
-                playerGameObject.transform.Rotate(0, 0, -Time.deltaTime * rotationSpeed * bodyToSkisTilt / 4);
+                playerGameObject.transform.Rotate(0, 0, -Time.deltaTime * rotationSpeed);
             }
-        }
-        
-
-        // przechylanie całego skoczka w przypadku zbytniego wychylenia lub odchylenia
-        
+        }        
 
         /* ograniczenie wychylenia skoczka - prototype
         if (feetBone.rotation.eulerAngles.z > 90) {
@@ -107,6 +105,8 @@ public class FlyingState : SkiJumperState
             }
         }
         */
+
+        Debug.Log("Nachylenie skoczka globalnie: " + playerGameObject.transform.localEulerAngles.z);
 
         // ladowanie na 2 nogi
         if (Input.GetKeyDown("space"))
@@ -126,10 +126,14 @@ public class FlyingState : SkiJumperState
 
     public override void PhysicsUpdate()
     {
-        Vector3 liftForce = Forces.Lift(playerRb.velocity, bounds.y);
+        float bodyToSkisCoeff = BodyToSkisCoefficientDecorator(CalculateTiltCoefficient(bodyToSkisTilt, 30));
+        float skiJumperTiltCoeff = SkiJumperCoefficientDecorator(CalculateTiltCoefficient(skiJumperTilt, 10));
 
+        Debug.Log("BodyToSkisCoeff: " + bodyToSkisCoeff);
+        Debug.Log("SkiJumperTilt: " + skiJumperTiltCoeff);
+
+        Vector3 liftForce = Forces.Lift(playerRb.velocity, bounds.y) * bodyToSkisCoeff * skiJumperTiltCoeff;
         Vector3 dragForce = Forces.Drag(playerRb.velocity, bounds.y);
-
         Vector3 velocity = new Vector3(playerRb.velocity.x, playerRb.velocity.y, 0);
         Vector3 gravity = new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0);
 
@@ -146,5 +150,34 @@ public class FlyingState : SkiJumperState
     public override void HandleLanding()
     {
         playerStateMachine.ChangeState(playerController.fallState);
+    }
+
+    private float CalculateTiltCoefficient(float tilt, float idealAngle) {
+        float coeff = 0;
+
+        if (tilt > 180 + idealAngle) {
+            coeff = 180 - tilt + idealAngle;
+        }
+        else {
+            coeff = tilt - idealAngle;
+        }
+
+        coeff = Mathf.Abs(coeff);
+
+        return coeff;
+    }
+
+    private float BodyToSkisCoefficientDecorator(float coefficient) {
+        float coeff = (1 - coefficient / 180) - 2 * (coefficient / 180);
+        coeff = Mathf.Clamp(coeff, 0, 1);
+
+        return coeff;
+    }
+
+    private float SkiJumperCoefficientDecorator(float coefficient) {
+        float coeff = (1 - coefficient / 180);        
+        coeff = Mathf.Clamp(coeff, 0, 1);
+
+        return coeff;
     }
 }
