@@ -12,13 +12,29 @@ public class FallState : SkiJumperState
     public override void Init() {
         Debug.Log("Upadek");
         enterFallState = true;
+        playerController.GetSkiJumperBody().SetActive(false);
+        playerController.skiJumperRagdoll = GameObject.Instantiate(playerController.GetSkiJumperRagdollPrefab(), playerGameObject.transform.position, playerGameObject.transform.rotation, playerGameObject.transform);
+        
+        GameObject ragdoll = playerController.skiJumperRagdoll;
+
+        Rigidbody2D[] rb2d = ragdoll.GetComponentsInChildren<Rigidbody2D>();
+
+        foreach(Rigidbody2D rb in rb2d) {
+            rb.velocity = playerRb.velocity;
+        }
+    }
+
+    public override void HandleUpdate()
+    {
+        
     }
 
     public override void PhysicsUpdate() {
-        if (enterFallState) {
+        /* if (enterFallState) {
             playerRb.AddForce(Vector3.up * 5, ForceMode2D.Impulse);
-            playerRb.angularVelocity = 0;
+            playerRb.AddTorque(-10, ForceMode2D.Impulse);
             enterFallState = false;
         }
+         */
     }
 }

@@ -18,6 +18,15 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField]
     private Transform skisBone;
+    
+    [SerializeField]
+    private GameObject skiJumperBody;
+
+    [SerializeField]
+    private GameObject skiJumperRagdollPrefab;
+
+    [HideInInspector]
+    public GameObject skiJumperRagdoll;
 
     public UnityEngine.UI.Text bestScoreText;
     public UnityEngine.UI.Text lastScoreText;
@@ -77,7 +86,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         transform.position = startingPoint.position + new Vector3(0, 2f, 0);;
-        transform.rotation = Quaternion.Euler(0, 0, 0);
+        transform.rotation = Quaternion.Euler(0, 0, -50);
     }
 
     void Update()
@@ -105,6 +114,7 @@ public class PlayerController : MonoBehaviour
         pelvisBoneEulerAngles.text = "PBEA: " + pelvisBone.rotation.eulerAngles.ToString();
         pelvisBoneLocalEulerAngles.text = "PBLEA: " + pelvisBone.localEulerAngles.ToString();
 
+        /*
         float angle = Vector3.Angle(feetBone.up, transform.up);
 
         float axisY = Input.GetAxisRaw("Vertical");
@@ -126,8 +136,11 @@ public class PlayerController : MonoBehaviour
                 pelvisBone.Rotate(0, 0, -Time.deltaTime * 20);
             }
         }
+        */
 
         if (Input.GetKeyDown(KeyCode.R)) {
+            skiJumperBody.SetActive(true);
+            Destroy(skiJumperRagdoll);
             playerRb.velocity = Vector2.zero;
             playerRb.angularVelocity = 0f;
             playerState.ChangeState(waitingForStart);
@@ -140,7 +153,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        Camera.main.transform.position = new Vector3(rotationCenter.position.x, rotationCenter.position.y, -1);
+        // Camera.main.transform.position = new Vector3(rotationCenter.position.x, rotationCenter.position.y, -1);
+        // Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -1);
+
+        Vector3 cameraPos = Vector3.zero;
+
+        if (playerState.CurrentState() != fallState) {
+            cameraPos = new Vector3(transform.position.x, transform.position.y, -1);    
+        }
+        else {
+            Debug.Log("UPADEK - POZYCJA RAGDOLLA");
+            cameraPos = new Vector3(skiJumperRagdoll.transform.position.x, skiJumperRagdoll.transform.position.y, -1);
+        }
+
+        Camera.main.transform.position = cameraPos;
+
         playerState.HandleUpdate();
     }
 
@@ -166,6 +193,14 @@ public class PlayerController : MonoBehaviour
 
     public Transform GetSkisBone() {
         return skisBone;
+    }
+
+    public GameObject GetSkiJumperBody() {
+        return skiJumperBody;
+    }
+
+    public GameObject GetSkiJumperRagdollPrefab() {
+        return skiJumperRagdollPrefab;
     }
 
     private float MeasureJumpDistance(Vector3 landedPosition) {
