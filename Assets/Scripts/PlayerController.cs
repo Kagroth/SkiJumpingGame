@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        transform.position = startingPoint.position + new Vector3(0, 2f, 0);;
+        transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);;
         transform.rotation = Quaternion.Euler(0, 0, -50);
     }
 
@@ -105,14 +105,14 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Ski Jumper eulerAngles: " + transform.rotation.eulerAngles);
         Debug.Log("Ski Jumper localEulerAngles: " + transform.localEulerAngles);*/
 
-        skiJumperEulerAngles.text = "SJEA: " + transform.rotation.eulerAngles.ToString();
+        /* skiJumperEulerAngles.text = "SJEA: " + transform.rotation.eulerAngles.ToString();
         skiJumperLocalEulerAngles.text = "SJLEA: " + transform.localEulerAngles.ToString();
         feetBoneEulerAngles.text = "FBEA: " + feetBone.rotation.eulerAngles.ToString();
         feetBoneLocalEulerAngles.text = "FBLEA: " + feetBone.localEulerAngles.ToString();
         kneeBoneEulerAngles.text = "KBEA: " + kneeBone.rotation.eulerAngles.ToString();
         kneeBoneLocalEulerAngles.text = "KBLEA: " + kneeBone.localEulerAngles.ToString();
         pelvisBoneEulerAngles.text = "PBEA: " + pelvisBone.rotation.eulerAngles.ToString();
-        pelvisBoneLocalEulerAngles.text = "PBLEA: " + pelvisBone.localEulerAngles.ToString();
+        pelvisBoneLocalEulerAngles.text = "PBLEA: " + pelvisBone.localEulerAngles.ToString(); */
 
         /*
         float angle = Vector3.Angle(feetBone.up, transform.up);
@@ -140,7 +140,11 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R)) {
             skiJumperBody.SetActive(true);
-            Destroy(skiJumperRagdoll);
+            
+            if (skiJumperRagdoll != null) {
+                Destroy(skiJumperRagdoll);            
+            }
+
             playerRb.velocity = Vector2.zero;
             playerRb.angularVelocity = 0f;
             playerState.ChangeState(waitingForStart);
@@ -164,6 +168,7 @@ public class PlayerController : MonoBehaviour
         else {
             Debug.Log("UPADEK - POZYCJA RAGDOLLA");
             cameraPos = new Vector3(skiJumperRagdoll.transform.position.x, skiJumperRagdoll.transform.position.y, -1);
+            Debug.Log("Pozycja kamery po upadku: " + cameraPos);
         }
 
         Camera.main.transform.position = cameraPos;
@@ -283,8 +288,9 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnCollisionExit2D(Collision2D other) {
-        if (other.gameObject.tag.Equals("Inrun") && playerState.CurrentState() != flyingState) {
-            // playerState.ChangeState(fallState);
+        if (other.gameObject.tag.Equals("Inrun") && playerState.CurrentState() != flyingState &&
+            other.gameObject.tag.Equals("Inrun") && playerState.CurrentState() != takeOffState) {
+            playerState.ChangeState(fallState);
         }
     }
 }
