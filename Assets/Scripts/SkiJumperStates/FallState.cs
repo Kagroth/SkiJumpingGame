@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class FallState : SkiJumperState
 {
@@ -13,20 +14,19 @@ public class FallState : SkiJumperState
         Debug.Log("Upadek");
         enterFallState = true;
         playerController.GetSkiJumperBody().SetActive(false);
-        playerController.skiJumperRagdoll = GameObject.Instantiate(playerController.GetSkiJumperRagdollPrefab(), playerGameObject.transform.position, playerGameObject.transform.rotation, playerGameObject.transform);
+        playerController.skiJumperRagdoll = GameObject.Instantiate(playerController.GetSkiJumperRagdollPrefab(), playerGameObject.transform.position, playerGameObject.transform.rotation);
+        playerController.skiJumperRagdoll.transform.localScale = new Vector3(0.3f, 0.3f, 1);
         
-        GameObject ragdoll = playerController.skiJumperRagdoll;
+        Rigidbody2D[] rb2d = playerController.skiJumperRagdoll.GetComponentsInChildren<Rigidbody2D>();
 
-        Rigidbody2D[] rb2d = ragdoll.GetComponentsInChildren<Rigidbody2D>();
-
-        foreach(Rigidbody2D rb in rb2d) {
-            rb.velocity = playerRb.velocity;
+        foreach(Rigidbody2D rigidbody in rb2d) {
+            rigidbody.velocity = playerRb.velocity;
         }
     }
 
     public override void HandleUpdate()
     {
-        
+
     }
 
     public override void PhysicsUpdate() {
@@ -35,6 +35,8 @@ public class FallState : SkiJumperState
             playerRb.AddTorque(-10, ForceMode2D.Impulse);
             enterFallState = false;
         }
-         */
+        */
+        
+        
     }
 }
