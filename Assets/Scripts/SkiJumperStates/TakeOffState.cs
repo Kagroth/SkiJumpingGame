@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TakeOffState : SkiJumperState
 {
-    private float maxTakeOffStrength = 6;
+    private float maxTakeOffStrength = 8;
     private float maxTakeOffDirection = 4;
 
     private float minTakeOffStrength = 1;
