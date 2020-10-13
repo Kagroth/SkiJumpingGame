@@ -80,7 +80,8 @@ public class FlyingState : SkiJumperState
             float axisX = Input.GetAxis("Horizontal");
 
             feetBone.Rotate(0, 0, axisY * Time.deltaTime * rotationSpeed);
-            playerGameObject.transform.Rotate(0, 0, axisX * Time.deltaTime * rotationSpeed);
+            feetBone.Rotate(0, 0, -axisX * Time.deltaTime * rotationSpeed);
+            // playerGameObject.transform.Rotate(0, 0, axisX * Time.deltaTime * rotationSpeed);
 
             bodyToSkisTilt = feetBone.localEulerAngles.z;
             skiJumperTilt = playerGameObject.transform.localEulerAngles.z;
@@ -127,10 +128,10 @@ public class FlyingState : SkiJumperState
     public override void PhysicsUpdate()
     {
         float bodyToSkisCoeff = BodyToSkisCoefficientDecorator(CalculateTiltCoefficient(bodyToSkisTilt, 30));
-        float skiJumperTiltCoeff = SkiJumperCoefficientDecorator(CalculateTiltCoefficient(skiJumperTilt, 10));
+        float skiJumperTiltCoeff = SkiJumperCoefficientDecorator(CalculateTiltCoefficient(skiJumperTilt, 0));
 
         Debug.Log("BodyToSkisCoeff: " + bodyToSkisCoeff);
-        Debug.Log("SkiJumperTilt: " + skiJumperTiltCoeff);
+        Debug.Log("SkiJumperCoeff: " + skiJumperTiltCoeff);
 
         Vector3 liftForce = Forces.Lift(playerRb.velocity, bounds.y) * bodyToSkisCoeff * skiJumperTiltCoeff;
         Vector3 dragForce = Forces.Drag(playerRb.velocity, bounds.y);
@@ -156,26 +157,26 @@ public class FlyingState : SkiJumperState
         float coeff = 0;
 
         if (tilt > 180 + idealAngle) {
-            coeff = 180 - tilt + idealAngle;
+            coeff = 360 - tilt + idealAngle;
         }
         else {
             coeff = tilt - idealAngle;
         }
 
-        coeff = Mathf.Abs(coeff);
+        coeff = Mathf.Abs(coeff); 
 
         return coeff;
     }
 
     private float BodyToSkisCoefficientDecorator(float coefficient) {
-        float coeff = (1 - coefficient / 180) - 2 * (coefficient / 180);
+        float coeff = (1 - coefficient / 180) - 2 * (coefficient / 180); 
         coeff = Mathf.Clamp(coeff, 0, 1);
 
         return coeff;
     }
 
     private float SkiJumperCoefficientDecorator(float coefficient) {
-        float coeff = (1 - coefficient / 180);        
+        float coeff = (1 - coefficient / 180);       
         coeff = Mathf.Clamp(coeff, 0, 1);
 
         return coeff;
