@@ -4,17 +4,16 @@ using UnityEngine;
 
 public class WindArea : MonoBehaviour
 {
-    ParticleSystem windParticleSystem;
     AreaEffector2D windEffector;
     BoxCollider2D boxCollider2D;
+
+    private float initialForce;
 
     // Start is called before the first frame update
     private void Awake() {
         windEffector = GetComponent<AreaEffector2D>();
         boxCollider2D = GetComponent<BoxCollider2D>();
-        ParticleSystem.ShapeModule ps = windParticleSystem.shape;
-        ps.position = Vector3.zero - new Vector3(0, boxCollider2D.size.y / 2, 0);
-        ps.scale = new Vector3(boxCollider2D.size.x, boxCollider2D.size.y, 1);
+        initialForce = Random.Range(-1, 3.5f);
     }
 
     void Start()
@@ -25,6 +24,6 @@ public class WindArea : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        windEffector.forceMagnitude = initialForce + Random.Range(-0.5f, 0.5f);
     }
 }
