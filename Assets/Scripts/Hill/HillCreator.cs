@@ -126,6 +126,7 @@ public class HillCreator : MonoBehaviour
         ConstructIdealTakeOffPoint(newHill);
         ConstructWindAreas(newWindAreas, windAreasCreator);
         ConstructKAndHSPoints(newHill);
+        CreateHillData(newHill, hillName, Kpoint, hillSizePoint);
     }
 
     public BezierCurveCreator GetInrunCreator() {
@@ -278,6 +279,34 @@ public class HillCreator : MonoBehaviour
         
         pointsContainer.transform.parent = hillPart.transform;
         kPoint.transform.parent = hsPoint.transform.parent = pointsContainer.transform;
+    }
+
+    
+    private void CreateHillData(GameObject hill, string hillName, float kPoint, float hsPoint) {
+        HillData hillData = ScriptableObject.CreateInstance<HillData>();
+        hillData.hillName = hillName;
+        hillData.kPoint = kPoint;
+        hillData.hsPoint = hsPoint;
+
+        float pointPerMeter = 0;
+
+        if (hsPoint < 115) {
+            pointPerMeter = 2;    
+        }
+        else if (hsPoint > 115 && hsPoint < 155) {
+            pointPerMeter = 1.8f;
+        }
+        else {
+            pointPerMeter = 1.2f;
+        }
+
+        hillData.pointPerMeter = pointPerMeter;
+
+        Hill hillComponent = hill.AddComponent<Hill>();
+        hillComponent.hillData = hillData;
+
+        AssetDatabase.CreateAsset(hillData, "Assets/Scripts/Hill/HillData/" + hill.name + ".asset");
+        AssetDatabase.SaveAssets();
     }
 
     private void OnDrawGizmos() {

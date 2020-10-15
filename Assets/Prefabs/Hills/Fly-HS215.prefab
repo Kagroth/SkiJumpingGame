@@ -329,6 +329,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5338821915342461892}
+  - component: {fileID: 4721483994932808615}
   m_Layer: 0
   m_Name: Fly-HS215
   m_TagString: Untagged
@@ -357,6 +358,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4721483994932808615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624635295979097819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9125c7c13a17dfc4286b8f2e1cf5902e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hillData: {fileID: 11400000, guid: d37de65e4f411e94faa515f5bba9e062, type: 2}
 --- !u!1 &2827573900518990545
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,20 +4,5 @@ using UnityEngine;
 
 public class Hill : MonoBehaviour
 {
-    [SerializeField]
-    GameObject inrun;
-
-    [SerializeField]
-    GameObject landingSlope;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public HillData hillData;
 }
