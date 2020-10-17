@@ -108,6 +108,7 @@ public class HillCreator : MonoBehaviour
         GameObject newWindAreas = new GameObject();
 
         newHill.name = string.IsNullOrEmpty(hillName) ? "Hill" : hillName;
+        newHill.tag = "Hill";
         newHillInrun.name = "Inrun";
         newHillInrun.tag = "Inrun";
         newHillLandingSlope.name = "LandingSlope";
@@ -290,10 +291,10 @@ public class HillCreator : MonoBehaviour
 
         float pointPerMeter = 0;
 
-        if (hsPoint < 115) {
+        if (hsPoint <= 115) {
             pointPerMeter = 2;    
         }
-        else if (hsPoint > 115 && hsPoint < 155) {
+        else if (hsPoint > 115 && hsPoint <= 155) {
             pointPerMeter = 1.8f;
         }
         else {
