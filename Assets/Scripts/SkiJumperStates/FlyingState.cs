@@ -19,6 +19,8 @@ public class FlyingState : SkiJumperState
  
     bool isAnimationEnter = true;
 
+    float flightTiltChange = 0;
+
     public FlyingState(GameObject playerGameObjectToSet, StateMachine playerStateMachineToSet) : base(playerGameObjectToSet, playerStateMachineToSet)
     {
 
@@ -29,6 +31,7 @@ public class FlyingState : SkiJumperState
         Debug.Log("Powierzchnia: " + playerGameObject.GetComponent<Collider2D>().bounds.size);
         xSpeed = 2;
         rotationSpeed = 100;
+        flightTiltChange = 0;
         feetBone = playerController.GetFeetBone();
         kneeBone = playerController.GetKneeBone();
         pelvisBone = playerController.GetPelvisBone();
@@ -79,8 +82,17 @@ public class FlyingState : SkiJumperState
             float axisY = Input.GetAxisRaw("Mouse Y");
             float axisX = Input.GetAxis("Horizontal");
 
-            feetBone.Rotate(0, 0, axisY * Time.deltaTime * rotationSpeed);
-            feetBone.Rotate(0, 0, -axisX * Time.deltaTime * rotationSpeed);
+            float mouseMoveRotation = axisY * Time.deltaTime * rotationSpeed;
+            float keysDownRotation = -axisX * Time.deltaTime * rotationSpeed;
+
+            if (mouseMoveRotation != 0 || keysDownRotation != 0) {
+                flightTiltChange += Mathf.Abs(mouseMoveRotation);
+                flightTiltChange += Mathf.Abs(keysDownRotation);
+            }
+
+            feetBone.Rotate(0, 0, mouseMoveRotation);
+            feetBone.Rotate(0, 0, keysDownRotation);
+
             // playerGameObject.transform.Rotate(0, 0, axisX * Time.deltaTime * rotationSpeed);
 
             bodyToSkisTilt = feetBone.localEulerAngles.z;
@@ -88,11 +100,15 @@ public class FlyingState : SkiJumperState
 
             if (bodyToSkisTilt > 60 && bodyToSkisTilt < 90)
             {
-                playerGameObject.transform.Rotate(0, 0, Time.deltaTime * rotationSpeed);
+                float skiJumperTiltChange = Time.deltaTime * rotationSpeed;
+                flightTiltChange += Mathf.Abs(skiJumperTiltChange);
+                playerGameObject.transform.Rotate(0, 0, skiJumperTiltChange);
             }
             else if (bodyToSkisTilt < 20 || bodyToSkisTilt > 300)
             {
-                playerGameObject.transform.Rotate(0, 0, -Time.deltaTime * rotationSpeed);
+                float skiJumperTiltChange = -Time.deltaTime * rotationSpeed;
+                flightTiltChange += Mathf.Abs(skiJumperTiltChange);
+                playerGameObject.transform.Rotate(0, 0, skiJumperTiltChange);
             }
         }        
 
@@ -180,5 +196,9 @@ public class FlyingState : SkiJumperState
         coeff = Mathf.Clamp(coeff, 0, 1);
 
         return coeff;
+    }
+
+    public float GetFlightTiltChange() {
+        return flightTiltChange;
     }
 }
