@@ -311,53 +311,42 @@ public class PlayerController : MonoBehaviour
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
             landingText.text = "Lądowanie: " + landingType.ToString();
 
-            /*
-                noty za styl
-                lot - 5
-                lądowanie - 5
-                upadek - 7
-                nieprawidlowa pozycja na odjezdzie - 3 -> moze byc zalezny od momentu podejscia do lądowania
-            */
-
             HillData hd = other.gameObject.transform.parent.GetComponent<Hill>().hillData;
-            float basePoints = hd.kPoint > 155 ? 120 : 60;
-            float diff = jumpDistance - hd.kPoint;
-            float distancePoints = diff * hd.pointPerMeter + basePoints;
+            
+            float distancePoints = CalculateDistancePoints(hd, jumpDistance);
 
-            Debug.Log("Punkty za odległość: " + distancePoints);
+            Judge[] judges = new Judge[5];
 
-            float stylePoints = 0;
-            float landingPoints = 0;
-
-            if (landingType == LandingData.TELEMARK)
-            {
-                landingPoints = 5;
-            }
-            else if (landingType == LandingData.BOTH_LEGS)
-            {
-                landingPoints = 3;
-            }
-            else
-            {
-                landingPoints = 0;
-            }
-
-            Debug.Log("Punkty za lądowanie: " + landingPoints);
-
+            bool landed = false;
+            string landingTypeForJudgeNotes = "";
             float flightTiltChange = flyingState.GetFlightTiltChange();
-            float flightPoints = CalculateFlightStylePoints(flightTiltChange);
-
-            stylePoints = flightPoints + landingPoints;
 
             if (playerState.CurrentState() == landedState) {
-                stylePoints += 7;
+                landed = true;
+                landingTypeForJudgeNotes = playerState.GetLandingData().GetLandingType();
             }
 
-            stylePoints += 3; // tymczasowo, patrz komentarz wyżej
+            float stylePoints = 0;
 
-            Debug.Log("Całkowita zmiana kątów w trakcie lotu: " + flightTiltChange);
-            Debug.Log("Punkty za lot: " + flightPoints);
-            Debug.Log("<color=green>Końcowa nota za skok: " + stylePoints + "</color>");
+            for(int index = 0; index < judges.Length; index++) {
+                judges[index] = new Judge("POL");
+                judges[index].CalculateJumpStylePoints(landed, landingTypeForJudgeNotes, flightTiltChange);
+            }
+            
+            // odrzucenie najnizszej i najwyzszej noty
+            judges = judges.OrderBy(judge => judge.GetJumpStylePoints()).ToArray();
+            judges[0].Reject();
+            judges[judges.Length - 1].Reject();
+
+            foreach(Judge j in judges) {
+                Debug.Log("Nota za styl: " + j.GetJumpStylePoints());
+            }
+
+            stylePoints = judges[1].GetJumpStylePoints() + judges[2].GetJumpStylePoints() + judges[3].GetJumpStylePoints();
+
+            float jumpPoints = stylePoints + distancePoints;
+
+            Debug.Log("<color=green>Końcowa nota za skok: " + jumpPoints + "</color>");
         }
     }
 
@@ -370,55 +359,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private float CalculateFlightStylePoints(float flightTiltChange)
-    {
-        float flightPoints = 0;
+    private float CalculateDistancePoints(HillData hillData, float jumpDistance) {
+        float basePoints = hillData.kPoint > 155 ? 120 : 60;
+        float diff = jumpDistance - hillData.kPoint;
+        float distancePoints = diff * hillData.pointPerMeter + basePoints;
 
-        if (flightTiltChange < 15)
-        {
-            flightPoints = 5;
-        }
-        else if (flightTiltChange >= 15 && flightTiltChange < 30)
-        {
-            flightPoints = 4.5f;
-        }
-        else if (flightTiltChange >= 30 && flightTiltChange < 60)
-        {
-            flightPoints = 4;
-        }
-        else if (flightTiltChange >= 60 && flightTiltChange < 90)
-        {
-            flightPoints = 3.5f;
-        }
-        else if (flightTiltChange >= 90 && flightTiltChange < 120)
-        {
-            flightPoints = 3;
-        }
-        else if (flightTiltChange >= 120 && flightTiltChange < 150)
-        {
-            flightPoints = 2.5f;
-        }
-        else if (flightTiltChange >= 150 && flightTiltChange < 180)
-        {
-            flightPoints = 2;
-        }
-        else if (flightTiltChange >= 180 && flightTiltChange < 210)
-        {
-            flightPoints = 1.5f;
-        }
-        else if (flightTiltChange >= 210 && flightTiltChange < 240)
-        {
-            flightPoints = 1;
-        }
-        else if (flightTiltChange >= 240 && flightTiltChange < 360)
-        {
-            flightPoints = 0.5f;
-        }
-        else
-        {
-            flightPoints = 0;
-        }
-
-        return flightPoints;
+        return distancePoints;
     }
 }
