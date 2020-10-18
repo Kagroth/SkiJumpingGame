@@ -8,8 +8,7 @@ public class GameManager : MonoBehaviour
     public GameObject skiJumperPrefab;
     
     private UIManager uIManager;
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         GameObject hill = Instantiate(hillPrefab);
@@ -32,5 +31,9 @@ public class GameManager : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Escape)) {
             SceneManager.LoadScene("MainMenu");
         }
+    }
+
+    public void DisplayJumpResult() {
+        uIManager.ToggleJumpResultPanel();
     }
 }
