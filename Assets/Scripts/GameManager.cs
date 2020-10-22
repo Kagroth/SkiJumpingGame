@@ -11,12 +11,15 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
-        hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");
+        if (!hillPrefab) {
+            hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");
+        }
+
         GameObject hill = Instantiate(hillPrefab);
         GameObject player = Instantiate(skiJumperPrefab);
         PlayerController pc = player.GetComponent<PlayerController>();
         uIManager = GetComponent<UIManager>();
-
+        uIManager.InitWindMeter();
         uIManager.hillInfo.text = hillPrefab.name.Replace("-", " ");
         pc.lastScoreText = uIManager.lastScore;
         pc.bestScoreText = uIManager.bestScore;

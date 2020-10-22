@@ -19,6 +19,10 @@ public class WindMeterUI : MonoBehaviour
 
     void Start()
     {
+        
+    }
+
+    public void Init() {
         windAreas = GameObject.FindGameObjectsWithTag("WindArea")
                               .Select(windAreaGameObject => {
                                   return windAreaGameObject.GetComponent<AreaEffector2D>();
@@ -40,7 +44,7 @@ public class WindMeterUI : MonoBehaviour
             }
         }
 
-        windForce = (windForce - 1) / windAreas.Length;
+        windForce = windForce / windAreas.Length;
 
         if (windForce > 0) {
             positiveWind.fillAmount = Mathf.Lerp(positiveWind.fillAmount, Mathf.Abs(windForce / maxWindForce), Time.deltaTime);

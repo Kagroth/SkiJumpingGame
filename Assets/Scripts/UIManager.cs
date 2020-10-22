@@ -19,6 +19,8 @@ public class UIManager : MonoBehaviour
     public Text resultValue;
     public Text[] judgePoints;
 
+    public WindMeterUI windMeter;
+
     private bool helpPanelShow = false;
     private bool jumpResultsPanelShow = false;
 
@@ -49,6 +51,10 @@ public class UIManager : MonoBehaviour
                 NOT KTORE WYPADAJA
             */
         }
+    }
+
+    public void InitWindMeter() {
+        windMeter.Init();
     }
 
     // Start is called before the first frame update
