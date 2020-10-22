@@ -64,6 +64,9 @@ public class PlayerController : MonoBehaviour
     private bool rotDir = true;
     private Quaternion target = Quaternion.Euler(0, 0, -170);
 
+    [SerializeField]
+    private UIManager uIManager;
+
     private void Awake()
     {
         playerRb = GetComponent<Rigidbody2D>();
@@ -139,13 +142,21 @@ public class PlayerController : MonoBehaviour
         }
         */
 
+        Debug.Log(skiJumperRagdoll);
+
         if (Input.GetKeyDown(KeyCode.R))
         {
+            if (uIManager.jumpResultsPanel.activeInHierarchy) {
+                uIManager.ToggleJumpResultPanel();
+            }
+
             skiJumperBody.SetActive(true);
 
-            if (skiJumperRagdoll != null)
+            if (skiJumperRagdoll)
             {
+                skiJumperRagdoll.SetActive(false);
                 Destroy(skiJumperRagdoll);
+                skiJumperRagdoll = null;
             }
 
             playerRb.velocity = Vector2.zero;
@@ -219,6 +230,10 @@ public class PlayerController : MonoBehaviour
     public GameObject GetSkiJumperRagdollPrefab()
     {
         return skiJumperRagdollPrefab;
+    }
+
+    public void SetUIManager(UIManager uIManager) {
+        this.uIManager = uIManager;
     }
 
     private float MeasureJumpDistance(Vector3 landedPosition)
@@ -347,6 +362,9 @@ public class PlayerController : MonoBehaviour
             float jumpPoints = stylePoints + distancePoints;
 
             Debug.Log("<color=green>Końcowa nota za skok: " + jumpPoints + "</color>");
+
+            uIManager.SetJumpResultData(jumpDistance, judges, jumpPoints);
+            uIManager.ToggleJumpResultPanel();
         }
     }
 
