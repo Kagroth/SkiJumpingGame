@@ -35,7 +35,7 @@ public class UIManager : MonoBehaviour
 
     public void ToggleJumpResultPanel() {
         jumpResultsPanelShow = !jumpResultsPanelShow;
-        jumpResultsPanel.SetActive(jumpResultsPanel);
+        jumpResultsPanel.SetActive(jumpResultsPanelShow);
     }
 
     public void SetJumpResultData(float jumpDistance, Judge[] judgePointsArr, float result) {
