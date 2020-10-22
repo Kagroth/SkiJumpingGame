@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
+        hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");
         GameObject hill = Instantiate(hillPrefab);
         GameObject player = Instantiate(skiJumperPrefab);
         PlayerController pc = player.GetComponent<PlayerController>();
@@ -20,6 +21,7 @@ public class GameManager : MonoBehaviour
         pc.lastScoreText = uIManager.lastScore;
         pc.bestScoreText = uIManager.bestScore;
         pc.landingText = uIManager.landingType;
+        pc.SetUIManager(uIManager);
     }
 
     // Update is called once per frame
