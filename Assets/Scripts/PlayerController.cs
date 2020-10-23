@@ -289,6 +289,8 @@ public class PlayerController : MonoBehaviour
 
             jumpPoints = stylePoints + distancePoints;
 
+            jumpPoints = Mathf.Clamp(jumpPoints, 0, jumpPoints);
+
             uIManager.SetJumpResultData(jumpDistance, judges, jumpPoints);
             uIManager.ToggleJumpResultPanel();
         }
