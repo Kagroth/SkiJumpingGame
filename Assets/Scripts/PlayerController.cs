@@ -91,7 +91,7 @@ public class PlayerController : MonoBehaviour
 
             skiJumperBody.SetActive(true);
 
-            if (skiJumperRagdoll) // active in hierarchy test
+            if (skiJumperRagdoll.activeInHierarchy)
             {
                 skiJumperRagdoll.SetActive(false);
                 Destroy(skiJumperRagdoll);
