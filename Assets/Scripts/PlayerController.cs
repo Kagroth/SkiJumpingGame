@@ -5,8 +5,6 @@ using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
-    public Transform rotationCenter;
-
     [SerializeField]
     private Transform feetBone;
 
@@ -31,17 +29,9 @@ public class PlayerController : MonoBehaviour
     public UnityEngine.UI.Text bestScoreText;
     public UnityEngine.UI.Text lastScoreText;
     public UnityEngine.UI.Text landingText;
-
-    public UnityEngine.UI.Text skiJumperEulerAngles;
-    public UnityEngine.UI.Text skiJumperLocalEulerAngles;
-    public UnityEngine.UI.Text feetBoneEulerAngles;
-    public UnityEngine.UI.Text feetBoneLocalEulerAngles;
-
-    public UnityEngine.UI.Text kneeBoneEulerAngles;
-    public UnityEngine.UI.Text kneeBoneLocalEulerAngles;
-
-    public UnityEngine.UI.Text pelvisBoneEulerAngles;
-    public UnityEngine.UI.Text pelvisBoneLocalEulerAngles;
+    
+    [SerializeField]
+    private UIManager uIManager;
     private float bestDistance = 0;
     private Rigidbody2D playerRb;
     Transform startingPoint;
@@ -61,11 +51,7 @@ public class PlayerController : MonoBehaviour
 
     public FallState fallState;
 
-    private bool rotDir = true;
-    private Quaternion target = Quaternion.Euler(0, 0, -170);
-
-    [SerializeField]
-    private UIManager uIManager;
+    private Judge[] judges;
 
     private void Awake()
     {
@@ -83,6 +69,8 @@ public class PlayerController : MonoBehaviour
         landedState = new LandedState(this.gameObject, playerState);
         fallState = new FallState(this.gameObject, playerState);
 
+        judges = new Judge[5];
+        
         playerState.ChangeState(waitingForStart);
     }
 
@@ -95,55 +83,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        /*
-        Vector3 vectorToTarget = Vector3.right;
-        Vector3 rotatedVectorToTarget = Quaternion.Euler(0, 0, 180) * vectorToTarget;
-
-        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, rotatedVectorToTarget);
-
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * 10);
-        
-        Debug.Log("Feet bone eulerAngles: " + feetBone.rotation.eulerAngles);
-        Debug.Log("Feet bone localEulerAngles: " + feetBone.localEulerAngles);
-        
-        Debug.Log("Ski Jumper eulerAngles: " + transform.rotation.eulerAngles);
-        Debug.Log("Ski Jumper localEulerAngles: " + transform.localEulerAngles);*/
-
-        /* skiJumperEulerAngles.text = "SJEA: " + transform.rotation.eulerAngles.ToString();
-        skiJumperLocalEulerAngles.text = "SJLEA: " + transform.localEulerAngles.ToString();
-        feetBoneEulerAngles.text = "FBEA: " + feetBone.rotation.eulerAngles.ToString();
-        feetBoneLocalEulerAngles.text = "FBLEA: " + feetBone.localEulerAngles.ToString();
-        kneeBoneEulerAngles.text = "KBEA: " + kneeBone.rotation.eulerAngles.ToString();
-        kneeBoneLocalEulerAngles.text = "KBLEA: " + kneeBone.localEulerAngles.ToString();
-        pelvisBoneEulerAngles.text = "PBEA: " + pelvisBone.rotation.eulerAngles.ToString();
-        pelvisBoneLocalEulerAngles.text = "PBLEA: " + pelvisBone.localEulerAngles.ToString(); */
-
-        /*
-        float angle = Vector3.Angle(feetBone.up, transform.up);
-
-        float axisY = Input.GetAxisRaw("Vertical");
-        float axisX = Input.GetAxis("Horizontal");
-
-        feetBone.Rotate(0, 0, -axisX * Time.deltaTime * 100);
-        // transform.Rotate(0, 0, axisY * Time.deltaTime * 100);
-        transform.RotateAround(rotationCenter.position, Vector3.forward, Time.deltaTime * axisY * 100);
-
-        if (Input.GetKey(KeyCode.Z)) {
-            if (Mathf.Abs(kneeBone.localEulerAngles.z - 60 ) > 1f) {
-                // kneeBone.Rotate(0, 0, Time.deltaTime * 20);
-                kneeBone.localRotation = Quaternion.RotateTowards(kneeBone.localRotation, Quaternion.Euler(0, 0, 300), -Time.deltaTime * 10);
-            }
-        }
-
-        if (Input.GetKey(KeyCode.X)) {
-            if (Mathf.Abs(pelvisBone.localEulerAngles.z - 210) > 1f) {
-                pelvisBone.Rotate(0, 0, -Time.deltaTime * 20);
-            }
-        }
-        */
-
-        Debug.Log(skiJumperRagdoll);
-
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (uIManager.jumpResultsPanel.activeInHierarchy) {
@@ -152,7 +91,7 @@ public class PlayerController : MonoBehaviour
 
             skiJumperBody.SetActive(true);
 
-            if (skiJumperRagdoll)
+            if (skiJumperRagdoll) // active in hierarchy test
             {
                 skiJumperRagdoll.SetActive(false);
                 Destroy(skiJumperRagdoll);
@@ -168,11 +107,9 @@ public class PlayerController : MonoBehaviour
             feetBone.localRotation = Quaternion.Euler(0, 0, 90);
             kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
             pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
+            judges = new Judge[5];
             return;
         }
-
-        // Camera.main.transform.position = new Vector3(rotationCenter.position.x, rotationCenter.position.y, -1);
-        // Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -1);
 
         Vector3 cameraPos = Vector3.zero;
 
@@ -182,9 +119,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Debug.Log("UPADEK - POZYCJA RAGDOLLA");
             cameraPos = new Vector3(skiJumperRagdoll.transform.position.x, skiJumperRagdoll.transform.position.y, -1);
-            Debug.Log("Pozycja kamery po upadku: " + cameraPos);
         }
 
         Camera.main.transform.position = cameraPos;
@@ -245,6 +180,8 @@ public class PlayerController : MonoBehaviour
         Vector3 nearestBezierPoint = bezierPoints.OrderBy(bp => Vector3.Distance(landedPosition, bp)).First();
 
         float jumpDistance = 0;
+        float distanceToAdd = 0;
+        float decimalPart = 0;
 
         for (int index = 0; index < bezierPoints.Length - 1; index++)
         {
@@ -267,8 +204,7 @@ public class PlayerController : MonoBehaviour
 
         jumpDistance = Mathf.Round(jumpDistance * 100) / 100;
 
-        float distanceToAdd = 0f;
-        float decimalPart = jumpDistance % 1;
+        decimalPart = jumpDistance % 1;
 
         if (decimalPart >= 0.75f)
         {
@@ -279,12 +215,8 @@ public class PlayerController : MonoBehaviour
             distanceToAdd = 0.5f;
         }
 
-        Debug.Log("Odleglosc skoku: " + jumpDistance);
-
         jumpDistance = Mathf.Floor(jumpDistance);
         jumpDistance += distanceToAdd;
-
-        Debug.Log("Odleglosc skoku: " + jumpDistance);
 
         return jumpDistance;
     }
@@ -301,12 +233,20 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 landedPosition = other.contacts[0].point;
             Vector3 landedPositionV3 = new Vector3(landedPosition.x, landedPosition.y, 0);
-
+            float jumpDistance = 0;
+            string landingType = "";
+            HillData hd = other.gameObject.transform.parent.GetComponent<Hill>().hillData;
+            float distancePoints = 0;
+            bool landed = false;
+            string landingTypeForJudgeNotes = "";
+            float flightTiltChange = 0;
+            float stylePoints = 0;
+            float jumpPoints = 0;
+            
             playerState.GetLandingData().SetLandingPoint(landedPositionV3);
             playerState.CurrentState().HandleLanding();
 
-            float jumpDistance = MeasureJumpDistance(landedPositionV3);
-            string landingType = "";
+            jumpDistance = MeasureJumpDistance(landedPositionV3);
 
             if (jumpDistance > bestDistance && playerState.CurrentState() == landedState)
             {
@@ -325,23 +265,15 @@ public class PlayerController : MonoBehaviour
             lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
             bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
             landingText.text = "Lądowanie: " + landingType.ToString();
-
-            HillData hd = other.gameObject.transform.parent.GetComponent<Hill>().hillData;
             
-            float distancePoints = CalculateDistancePoints(hd, jumpDistance);
+            distancePoints = CalculateDistancePoints(hd, jumpDistance);
 
-            Judge[] judges = new Judge[5];
-
-            bool landed = false;
-            string landingTypeForJudgeNotes = "";
-            float flightTiltChange = flyingState.GetFlightTiltChange();
+            flightTiltChange = flyingState.GetFlightTiltChange();
 
             if (playerState.CurrentState() == landedState) {
                 landed = true;
                 landingTypeForJudgeNotes = playerState.GetLandingData().GetLandingType();
             }
-
-            float stylePoints = 0;
 
             for(int index = 0; index < judges.Length; index++) {
                 judges[index] = new Judge("POL");
@@ -353,15 +285,9 @@ public class PlayerController : MonoBehaviour
             judges[0].Reject();
             judges[judges.Length - 1].Reject();
 
-            foreach(Judge j in judges) {
-                Debug.Log("Nota za styl: " + j.GetJumpStylePoints());
-            }
-
             stylePoints = judges[1].GetJumpStylePoints() + judges[2].GetJumpStylePoints() + judges[3].GetJumpStylePoints();
 
-            float jumpPoints = stylePoints + distancePoints;
-
-            Debug.Log("<color=green>Końcowa nota za skok: " + jumpPoints + "</color>");
+            jumpPoints = stylePoints + distancePoints;
 
             uIManager.SetJumpResultData(jumpDistance, judges, jumpPoints);
             uIManager.ToggleJumpResultPanel();
