@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class FlyingState : SkiJumperState
 {
-    float xSpeed;
-
     float rotationSpeed;
 
     Vector3 bounds;
@@ -28,8 +26,6 @@ public class FlyingState : SkiJumperState
 
     public override void Init()
     {
-        Debug.Log("Powierzchnia: " + playerGameObject.GetComponent<Collider2D>().bounds.size);
-        xSpeed = 2;
         rotationSpeed = 100;
         flightTiltChange = 0;
         feetBone = playerController.GetFeetBone();
@@ -38,6 +34,7 @@ public class FlyingState : SkiJumperState
         skisBone = playerController.GetSkisBone();
 
         bounds = playerGameObject.GetComponent<Collider2D>().bounds.size;
+        Debug.Log("Powierzchnia: " + bounds);
         Debug.Log("Lecę");
         isAnimationEnter = true;
 }
@@ -50,21 +47,18 @@ public class FlyingState : SkiJumperState
             if (Mathf.Abs(playerController.GetFeetBone().localEulerAngles.z - 45) > 1f)
             {
                 playerController.GetFeetBone().localRotation = Quaternion.Euler(playerController.GetFeetBone().localEulerAngles + Vector3.forward * Time.deltaTime);
-                // playerController.GetFeetBone().Rotate(0, 0, Time.deltaTime * 100);
                 Transform feetBone = playerController.GetFeetBone();
                 feetBone.localRotation = Quaternion.RotateTowards(feetBone.localRotation, Quaternion.Euler(0, 0, 315), Time.deltaTime * 150);
             }
 
             if (playerController.GetKneeBone().localEulerAngles.z > 1f)
             {
-                //playerController.GetKneeBone().Rotate(0, 0, -Time.deltaTime * 100);
                 Transform kneeBone = playerController.GetKneeBone();
                 kneeBone.localRotation = Quaternion.RotateTowards(kneeBone.localRotation, Quaternion.Euler(0, 0, 0), Time.deltaTime * 100);
             }
 
             if (Mathf.Abs(playerController.GetPelvisBone().localEulerAngles.z - 330) > 1f)
             {
-                // playerController.GetPelvisBone().Rotate(0, 0, -Time.deltaTime * 100);
                 Transform pelvisBone = playerController.GetPelvisBone();
                 pelvisBone.localRotation = Quaternion.RotateTowards(pelvisBone.localRotation, Quaternion.Euler(0, 0, 330), Time.deltaTime * 150);
             }
@@ -92,8 +86,6 @@ public class FlyingState : SkiJumperState
 
             feetBone.Rotate(0, 0, mouseMoveRotation);
             feetBone.Rotate(0, 0, keysDownRotation);
-
-            // playerGameObject.transform.Rotate(0, 0, axisX * Time.deltaTime * rotationSpeed);
 
             bodyToSkisTilt = feetBone.localEulerAngles.z;
             skiJumperTilt = playerGameObject.transform.localEulerAngles.z;
@@ -123,21 +115,17 @@ public class FlyingState : SkiJumperState
         }
         */
 
-        Debug.Log("Nachylenie skoczka globalnie: " + playerGameObject.transform.localEulerAngles.z);
-
         // ladowanie na 2 nogi
         if (Input.GetKeyDown("space"))
         {
             playerStateMachine.SetLandingType(LandingData.BOTH_LEGS);
             playerStateMachine.ChangeState(playerController.landingState);
-            //playerAnimator.SetBool("landing", true);
         }
         // ladowanie telemarkiem
         else if (Input.GetKeyDown("down"))
         {
             playerStateMachine.SetLandingType(LandingData.TELEMARK);
             playerStateMachine.ChangeState(playerController.landingState);
-            //playerAnimator.SetBool("landing", true);
         }
     }
 
@@ -145,9 +133,6 @@ public class FlyingState : SkiJumperState
     {
         float bodyToSkisCoeff = BodyToSkisCoefficientDecorator(CalculateTiltCoefficient(bodyToSkisTilt, 30));
         float skiJumperTiltCoeff = SkiJumperCoefficientDecorator(CalculateTiltCoefficient(skiJumperTilt, 0));
-
-        Debug.Log("BodyToSkisCoeff: " + bodyToSkisCoeff);
-        Debug.Log("SkiJumperCoeff: " + skiJumperTiltCoeff);
 
         Vector3 liftForce = Forces.Lift(playerRb.velocity, bounds.y) * bodyToSkisCoeff * skiJumperTiltCoeff;
         Vector3 dragForce = Forces.Drag(playerRb.velocity, bounds.y);

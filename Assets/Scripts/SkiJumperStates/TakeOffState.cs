@@ -49,4 +49,9 @@ public class TakeOffState : SkiJumperState
     public override void PhysicsUpdate() {
 
     }
+
+    public override void HandleLanding()
+    {
+
+    }
 }

@@ -5,12 +5,15 @@ using UnityEngine;
 public class LandedState : SkiJumperState
 {
     bool brake;
-    public LandedState(GameObject playerGameObject, StateMachine playerStateMachine) : base(playerGameObject, playerStateMachine) {
 
+    Vector3 bounds;
+
+    public LandedState(GameObject playerGameObject, StateMachine playerStateMachine) : base(playerGameObject, playerStateMachine) {
+        brake = true;
+        bounds = playerGameObject.GetComponent<Collider2D>().bounds.size;
     }
 
     public override void Init() {
-        brake = true;
         Debug.Log("Skok ustany - " + playerStateMachine.GetLandingData().GetLandingType());
     }
 
@@ -25,7 +28,7 @@ public class LandedState : SkiJumperState
 
     public override void PhysicsUpdate() {
         if (brake) {
-            playerRb.AddForce(Forces.Drag(playerRb.velocity, playerGameObject.GetComponent<Collider2D>().bounds.size.y) + Vector3.left);
+            playerRb.AddForce(Forces.Drag(playerRb.velocity, bounds.y) + Vector3.left);
         }
         else {
             playerRb.velocity = Vector3.zero;

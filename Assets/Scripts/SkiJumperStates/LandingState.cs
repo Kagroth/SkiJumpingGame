@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class LandingState : SkiJumperState
 {
+    Vector3 bounds;
+
     public LandingState(GameObject playerGameObject, StateMachine playerStateMachine) : base(playerGameObject, playerStateMachine)
     {
-
+        bounds = playerGameObject.GetComponent<Collider2D>().bounds.size;
     }
 
     public override void Init()
@@ -51,7 +53,7 @@ public class LandingState : SkiJumperState
 
     public override void PhysicsUpdate()
     {
-
+        playerRb.AddForce(Forces.Drag(playerRb.velocity, bounds.y), ForceMode2D.Force);
     }
 
     public override void HandleLanding()
