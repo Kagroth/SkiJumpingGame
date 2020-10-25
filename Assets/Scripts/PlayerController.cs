@@ -26,13 +26,16 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public GameObject skiJumperRagdoll;
 
+    public delegate void SkiJumperStateChange();
+    public SkiJumperStateChange skiJumperEndJumpHandler;
+    public SkiJumperStateChange skiJumperStartJumpHandler;
+
     public UnityEngine.UI.Text bestScoreText;
     public UnityEngine.UI.Text lastScoreText;
     public UnityEngine.UI.Text landingText;
     
-    [SerializeField]
-    private UIManager uIManager;
     private float bestDistance = 0;
+
     private Rigidbody2D playerRb;
     Transform startingPoint;
     Transform idealTakeOffPoint;
@@ -51,7 +54,19 @@ public class PlayerController : MonoBehaviour
 
     public FallState fallState;
 
-    private Judge[] judges;
+    public struct JumpResultData {
+        public float jumpDistance;
+        public Judge[] judges;
+        public float jumpPoints;
+
+        public JumpResultData(float distance, Judge[] judgesArr, float points) {
+            jumpDistance = distance;
+            judges = judgesArr;
+            jumpPoints = points;
+        }
+    }
+
+    private JumpResultData jumpResultData;
 
     private void Awake()
     {
@@ -69,7 +84,7 @@ public class PlayerController : MonoBehaviour
         landedState = new LandedState(this.gameObject, playerState);
         fallState = new FallState(this.gameObject, playerState);
 
-        judges = new Judge[5];
+        //judges = new Judge[5];
         
         playerState.ChangeState(waitingForStart);
     }
@@ -85,10 +100,6 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (uIManager.jumpResultsPanel.activeInHierarchy) {
-                uIManager.ToggleJumpResultPanel();
-            }
-
             skiJumperBody.SetActive(true);
 
             if (skiJumperRagdoll.activeInHierarchy)
@@ -107,7 +118,7 @@ public class PlayerController : MonoBehaviour
             feetBone.localRotation = Quaternion.Euler(0, 0, 90);
             kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
             pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
-            judges = new Judge[5];
+            skiJumperStartJumpHandler();
             return;
         }
 
@@ -167,10 +178,6 @@ public class PlayerController : MonoBehaviour
         return skiJumperRagdollPrefab;
     }
 
-    public void SetUIManager(UIManager uIManager) {
-        this.uIManager = uIManager;
-    }
-
     private float MeasureJumpDistance(Vector3 landedPosition)
     {
         BezierCurve bc = landingSlope.GetComponent<BezierCurve>();
@@ -221,6 +228,10 @@ public class PlayerController : MonoBehaviour
         return jumpDistance;
     }
 
+    public JumpResultData GetJumpResultData() {
+        return jumpResultData;
+    }
+    
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (playerState.CurrentState() == fallState ||
@@ -231,6 +242,7 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.tag.Equals("LandingSlope"))
         {
+            Judge[] judges = new Judge[5];
             Vector2 landedPosition = other.contacts[0].point;
             Vector3 landedPositionV3 = new Vector3(landedPosition.x, landedPosition.y, 0);
             float jumpDistance = 0;
@@ -291,8 +303,9 @@ public class PlayerController : MonoBehaviour
 
             jumpPoints = Mathf.Clamp(jumpPoints, 0, jumpPoints);
 
-            uIManager.SetJumpResultData(jumpDistance, judges, jumpPoints);
-            uIManager.ToggleJumpResultPanel();
+            jumpResultData = new JumpResultData(jumpDistance, judges, jumpPoints);
+            
+            skiJumperEndJumpHandler();
         }
     }
 

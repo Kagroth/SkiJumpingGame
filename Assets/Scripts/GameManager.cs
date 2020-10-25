@@ -2,15 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 public class GameManager : MonoBehaviour
 {
+    [System.Serializable]
+    public class SceneUI {
+        public string name;
+        public GameObject uiPrefab;
+    }
+
+    private GameObject currentUI;
+    private UIManager currentUIManager;
+
+    public SceneUI[] sceneUIPrefabs; 
+
     public static GameObject hillPrefab;
     public GameObject skiJumperPrefab;
-    
-    private UIManager uIManager;
-    
+        
     void Start()
     {
+        LoadSceneUI();
+
         if (!hillPrefab) {
             hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");
         }
@@ -18,20 +30,18 @@ public class GameManager : MonoBehaviour
         GameObject hill = Instantiate(hillPrefab);
         GameObject player = Instantiate(skiJumperPrefab);
         PlayerController pc = player.GetComponent<PlayerController>();
-        uIManager = GetComponent<UIManager>();
-        uIManager.InitWindMeter();
-        uIManager.hillInfo.text = hillPrefab.name.Replace("-", " ");
-        pc.lastScoreText = uIManager.lastScore;
-        pc.bestScoreText = uIManager.bestScore;
-        pc.landingText = uIManager.landingType;
-        pc.SetUIManager(uIManager);
+        currentUIManager.InitWindMeter();
+        currentUIManager.hillInfo.text = hillPrefab.name.Replace("-", " ");
+        pc.lastScoreText = currentUIManager.lastScore;
+        pc.bestScoreText = currentUIManager.bestScore;
+        pc.landingText = currentUIManager.landingType;
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.H)) {
-            uIManager.ToggleHelpPanel();
+            currentUIManager.ToggleHelpPanel();
         }
         else if (Input.GetKeyDown(KeyCode.Escape)) {
             SceneManager.LoadScene("MainMenu");
@@ -39,6 +49,16 @@ public class GameManager : MonoBehaviour
     }
 
     public void DisplayJumpResult() {
-        uIManager.ToggleJumpResultPanel();
+        // currentUIManager.ToggleJumpResultPanel();
+    }
+
+    public void LoadSceneUI() {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        
+        SceneUI UIToLoad = sceneUIPrefabs.Where(sceneUI => sceneUI.name.Equals(currentSceneName)).First();
+
+        currentUI = Instantiate(UIToLoad.uiPrefab, Vector3.zero, Quaternion.identity);
+        currentUIManager = currentUI.GetComponent<UIManager>();
+        currentUIManager.Init();
     }
 }
