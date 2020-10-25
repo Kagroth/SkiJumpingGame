@@ -21,37 +21,28 @@ public class GameManager : MonoBehaviour
         
     void Start()
     {
+        InitScene();
         LoadSceneUI();
-
-        if (!hillPrefab) {
-            hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");
-        }
-
-        GameObject hill = Instantiate(hillPrefab);
-        GameObject player = Instantiate(skiJumperPrefab);
-        PlayerController pc = player.GetComponent<PlayerController>();
-        currentUIManager.InitWindMeter();
-        currentUIManager.hillInfo.text = hillPrefab.name.Replace("-", " ");
-        pc.lastScoreText = currentUIManager.lastScore;
-        pc.bestScoreText = currentUIManager.bestScore;
-        pc.landingText = currentUIManager.landingType;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H)) {
-            currentUIManager.ToggleHelpPanel();
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape)) {
-            SceneManager.LoadScene("MainMenu");
-        }
+        
     }
 
-    public void DisplayJumpResult() {
-        // currentUIManager.ToggleJumpResultPanel();
+    public void InitScene() {
+        if (SceneManager.GetActiveScene().name.Equals("Competition")) {
+            if (!hillPrefab) {
+                hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");                
+            }
+            
+            GameObject hill = Instantiate(hillPrefab);
+            GameObject player = Instantiate(skiJumperPrefab);
+            PlayerController pc = player.GetComponent<PlayerController>();
+        }
     }
-
+    
     public void LoadSceneUI() {
         string currentSceneName = SceneManager.GetActiveScene().name;
         

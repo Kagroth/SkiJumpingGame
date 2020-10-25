@@ -33,6 +33,10 @@ public class WindMeterUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(windAreas == null || windAreas.Length == 0) {
+            return;
+        }
+
         float windForce = 0; 
 
         foreach (AreaEffector2D ae2D in windAreas) {

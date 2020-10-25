@@ -15,13 +15,17 @@ public class Judge
         rejected = false;
         jumpStylePoints = 0;
     }
-    
+
     public float GetJumpStylePoints() {
         return jumpStylePoints;
     }
 
     public void Reject() {
         rejected = true;
+    }
+
+    public bool IsRejected() {
+        return rejected;
     }
 
     /*
