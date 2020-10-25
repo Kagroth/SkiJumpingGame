@@ -29,10 +29,6 @@ public class PlayerController : MonoBehaviour
     public delegate void SkiJumperStateChange();
     public SkiJumperStateChange skiJumperEndJumpHandler;
     public SkiJumperStateChange skiJumperStartJumpHandler;
-
-    public UnityEngine.UI.Text bestScoreText;
-    public UnityEngine.UI.Text lastScoreText;
-    public UnityEngine.UI.Text landingText;
     
     private float bestDistance = 0;
 
@@ -114,7 +110,7 @@ public class PlayerController : MonoBehaviour
             playerState.ChangeState(waitingForStart);
             transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
             transform.rotation = Quaternion.Euler(0, 0, -50);
-            landingText.text = "Lądowanie:";
+            // landingText.text = "Lądowanie:";
             feetBone.localRotation = Quaternion.Euler(0, 0, 90);
             kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
             pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
@@ -232,6 +228,10 @@ public class PlayerController : MonoBehaviour
         return jumpResultData;
     }
     
+    public float GetBestDistance() {
+        return bestDistance;
+    }
+
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (playerState.CurrentState() == fallState ||
@@ -274,10 +274,6 @@ public class PlayerController : MonoBehaviour
                 landingType = "upadek";
             }
 
-            lastScoreText.text = "Ostatni wynik: " + jumpDistance.ToString();
-            bestScoreText.text = "Najlepszy wynik: " + bestDistance.ToString();
-            landingText.text = "Lądowanie: " + landingType.ToString();
-            
             distancePoints = CalculateDistancePoints(hd, jumpDistance);
 
             flightTiltChange = flyingState.GetFlightTiltChange();
@@ -298,10 +294,14 @@ public class PlayerController : MonoBehaviour
             judges[judges.Length - 1].Reject();
 
             stylePoints = judges[1].GetJumpStylePoints() + judges[2].GetJumpStylePoints() + judges[3].GetJumpStylePoints();
+            
+            System.Random rnd = new System.Random();
+    
+            judges = judges.OrderBy(judge => rnd.Next()).ToArray();
 
             jumpPoints = stylePoints + distancePoints;
 
-            jumpPoints = Mathf.Clamp(jumpPoints, 0, jumpPoints);
+            jumpPoints = Mathf.Clamp(jumpPoints, 0, jumpPoints); // punkty za skok nie moga byc mniejsze niz 0
 
             jumpResultData = new JumpResultData(jumpDistance, judges, jumpPoints);
             
