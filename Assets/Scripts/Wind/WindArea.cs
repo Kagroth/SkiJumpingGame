@@ -26,4 +26,8 @@ public class WindArea : MonoBehaviour
     {
         windEffector.forceMagnitude = initialForce + Random.Range(-0.5f, 0.5f);
     }
+
+    public float GetWindForce() {
+        return windEffector.forceMagnitude;
+    }
 }
