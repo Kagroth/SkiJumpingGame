@@ -14,6 +14,11 @@ public class SkiJumperSimulatorController : MonoBehaviour
     {
         skiJumperSimulator = new SkiJumperSimulator();
         skiJumpers = new SkiJumperComputer[1];
+
+        for(int index = 0; index < skiJumpers.Length; index++) {
+            skiJumpers[index] = new SkiJumperComputer();
+        }
+
         skiJumperSimulator.SetHill(hill);
         SimulateAllJumpers();    
     }

@@ -18,5 +18,8 @@ public class SkiJumperComputer
 
     public JumpResultData jumpResultData;
 
+    public SkiJumperComputer() {
+        jumpResultData = new JumpResultData(0, new Judge[5], 0);
+    }
 
 }

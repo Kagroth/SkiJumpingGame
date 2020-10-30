@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class SkiJumperSimulator : MonoBehaviour
 {
@@ -90,6 +91,111 @@ public class SkiJumperSimulator : MonoBehaviour
         Debug.Log("(HS - K) * windCoeff: " + (hillData.hsPoint - hillData.kPoint) * windCoeff);
         
         Debug.Log("Odleglosc: " + jumpDistance);
-        // skiJumperComputer.jumpResultData.jumpDistance = jumpDistance;
+
+        skiJumperComputer.jumpResultData.jumpDistance = jumpDistance;
+        skiJumperComputer.jumpResultData.judges = GenerateJudgeNotes(jumpDistance);
+
+        float jumpStylePoints = skiJumperComputer.jumpResultData.judges[1].GetJumpStylePoints() + 
+                                skiJumperComputer.jumpResultData.judges[2].GetJumpStylePoints() + 
+                                skiJumperComputer.jumpResultData.judges[3].GetJumpStylePoints();
+        
+        skiJumperComputer.jumpResultData.jumpPoints = jumpStylePoints;
+
+        System.Random rnd = new System.Random();
+    
+        skiJumperComputer.jumpResultData.judges = skiJumperComputer.jumpResultData.judges.OrderBy(judge => rnd.Next()).ToArray();
+
+        foreach (Judge judge in skiJumperComputer.jumpResultData.judges) {
+            Debug.Log("Style: " + judge.GetJumpStylePoints());
+        }
+    }
+
+    private bool HasLanded(float jumpDistance, float rand) {
+        bool landed = false;
+
+        if (jumpDistance <= hillData.kPoint) {
+            // prawdopodobienstwo ustania 98% (0-95 telemark, 95-98 both legs)
+            if (rand > 0.98f) {
+                landed = false;
+            }
+            else {
+                landed = true;
+            }
+        }
+        else if (jumpDistance > hillData.kPoint && jumpDistance < hillData.hsPoint) {
+            // prawdopodobienstwo ustania 95% (0-93 telemark, 93-95 both legs)
+            if (rand > 0.95f) {
+                landed = false;
+            }
+            else {
+                landed = true;
+            }
+        }
+        else {
+            // prawdopodobienstwo ustania 90% (0-50 telemark, 50-90 both legs)
+            if (rand > 0.9f) {
+                landed = false;
+            }
+            else {
+                landed = true;
+            }
+        }
+
+        return landed;
+    }
+
+    private string GenerateLandingType(float jumpDistance, float landingFloat) {
+        if (jumpDistance <= hillData.kPoint) {
+            // prawdopodobienstwo ustania 98% (0-95 telemark, 95-98 both legs)
+            if (landingFloat > 0.95f && landingFloat < 0.98f) {
+                return LandingData.BOTH_LEGS;
+            }
+            else {
+                return LandingData.TELEMARK;
+            }
+        }
+        else if (jumpDistance > hillData.kPoint && jumpDistance < hillData.hsPoint) {
+            // prawdopodobienstwo ustania 95% (0-93 telemark, 93-95 both legs)
+            if (landingFloat > 0.93f && landingFloat < 0.95f) {
+                return LandingData.BOTH_LEGS;
+            }
+            else {
+                return LandingData.TELEMARK;
+            }
+        }
+        else {
+            // prawdopodobienstwo ustania 90% (0-50 telemark, 50-90 both legs)
+            if (landingFloat > 0.5f && landingFloat < 0.9f) {
+                return LandingData.BOTH_LEGS;
+            }
+            else {
+                return LandingData.TELEMARK;
+            }
+        }
+    }
+
+    private Judge[] GenerateJudgeNotes(float jumpDistance) {
+        Judge[] judges = new Judge[5];
+        string landing = "";
+
+        float landingProbability = Random.Range(0f, 1f);
+
+        bool landed = HasLanded(jumpDistance, landingProbability);
+
+        if (landed) {
+            landing = GenerateLandingType(jumpDistance, landingProbability);
+        }
+
+        for(int index = 0; index < judges.Length; index++) {
+            judges[index] = new Judge("POL");
+            judges[index].SetComputerPoints(landed, landing);
+        }
+
+        // odrzucenie najnizszej i najwyzszej noty
+        judges = judges.OrderBy(judge => judge.GetJumpStylePoints()).ToArray();
+        judges[0].Reject();
+        judges[judges.Length - 1].Reject();        
+
+        return judges;
     }
 }
