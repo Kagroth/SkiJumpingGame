@@ -106,8 +106,6 @@ public class SkiJumperSimulator : MonoBehaviour
         System.Random rnd = new System.Random();
     
         skiJumperComputer.jumpResultData.judges = skiJumperComputer.jumpResultData.judges.OrderBy(judge => rnd.Next()).ToArray();
-
-        Debug.Log("Wynik komputera: " + skiJumperComputer.jumpResultData.jumpPoints);
     }
 
     private bool HasLanded(float jumpDistance, float rand) {
