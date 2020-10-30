@@ -98,16 +98,16 @@ public class SkiJumperSimulator : MonoBehaviour
         float jumpStylePoints = skiJumperComputer.jumpResultData.judges[1].GetJumpStylePoints() + 
                                 skiJumperComputer.jumpResultData.judges[2].GetJumpStylePoints() + 
                                 skiJumperComputer.jumpResultData.judges[3].GetJumpStylePoints();
-        
-        skiJumperComputer.jumpResultData.jumpPoints = jumpStylePoints;
+       
+        float distancePoints = CalculateDistancePoints(hillData, jumpDistance);
+
+        skiJumperComputer.jumpResultData.jumpPoints = jumpStylePoints + distancePoints;
 
         System.Random rnd = new System.Random();
     
         skiJumperComputer.jumpResultData.judges = skiJumperComputer.jumpResultData.judges.OrderBy(judge => rnd.Next()).ToArray();
 
-        foreach (Judge judge in skiJumperComputer.jumpResultData.judges) {
-            Debug.Log("Style: " + judge.GetJumpStylePoints());
-        }
+        Debug.Log("Wynik komputera: " + skiJumperComputer.jumpResultData.jumpPoints);
     }
 
     private bool HasLanded(float jumpDistance, float rand) {
@@ -197,5 +197,13 @@ public class SkiJumperSimulator : MonoBehaviour
         judges[judges.Length - 1].Reject();        
 
         return judges;
+    }
+
+    private float CalculateDistancePoints(HillData hillData, float jumpDistance) {
+        float basePoints = hillData.kPoint > 155 ? 120 : 60;
+        float diff = jumpDistance - hillData.kPoint;
+        float distancePoints = diff * hillData.pointPerMeter + basePoints;
+
+        return distancePoints;
     }
 }
