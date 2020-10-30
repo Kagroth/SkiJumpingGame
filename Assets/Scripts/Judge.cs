@@ -140,4 +140,27 @@ public class Judge
 
         return flightPoints;
     }
+
+    public void SetComputerPoints(bool landed, string landingType) {
+        jumpStylePoints = 0;
+
+        if (landed) {
+            jumpStylePoints += 7;
+
+            if (landingType == LandingData.TELEMARK) {
+                jumpStylePoints += 5;
+            }
+            else {
+                jumpStylePoints += 3;
+            }
+        }
+
+        jumpStylePoints += 3;
+
+        float[] flightPoints = new float[] {2, 2.5f, 3, 3.5f, 4, 4.5f, 5};
+
+        jumpStylePoints += flightPoints[Random.Range(0, flightPoints.Length - 1)];
+
+        RandomizePoints();
+    }
 }
