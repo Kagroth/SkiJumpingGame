@@ -21,9 +21,15 @@ public class SkiJumperDatabase
     public static void GenerateSkiJumpersFile() {
         List<SkiJumper> skiJumpersToSave = new List<SkiJumper>();
         
-        skiJumpersToSave.Add(new SkiJumper("Janusz", "Kowalski", true));
-        skiJumpersToSave.Add(new SkiJumper("Andrzej", "Nowak", true));
-        skiJumpersToSave.Add(new SkiJumper("Mariusz", "Klamkowski", true));
+        skiJumpersToSave.Add(new SkiJumper("Janusz Kowalski", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Andrzej Nowak", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Mariusz Klamkowski", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Grzegorz Brzeczyszcz", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Mieczysław Gołąb", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Zbigniew Dzik", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Józef Laczek", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Aleksander Ogień", "Polska", true));
+        skiJumpersToSave.Add(new SkiJumper("Jarosław Podmostowski", "Polska", true));
 
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/skijumpers.dat");
