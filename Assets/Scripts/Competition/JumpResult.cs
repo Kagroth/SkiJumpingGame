@@ -13,6 +13,10 @@ public class JumpResult
     [SerializeField]
     public float jumpPoints;
 
+    public JumpResult() {
+        
+    }
+
     public JumpResult(float distance, Judge[] judgesArr, float points)
     {
         jumpDistance = distance;
