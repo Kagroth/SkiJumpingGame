@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     public static GameObject hillPrefab;
     public GameObject skiJumperPrefab;
+    private GameObject hill;
         
     void Start()
     {
@@ -37,7 +38,7 @@ public class GameManager : MonoBehaviour
                 hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");                
             }
             
-            GameObject hill = Instantiate(hillPrefab);
+            hill = Instantiate(hillPrefab);
             GameObject player = Instantiate(skiJumperPrefab);
             PlayerController pc = player.GetComponent<PlayerController>();
         }
@@ -50,6 +51,7 @@ public class GameManager : MonoBehaviour
 
         currentUI = Instantiate(UIToLoad.uiPrefab, Vector3.zero, Quaternion.identity);
         currentUIManager = currentUI.GetComponent<UIManager>();
+        currentUIManager.hill = hill;
         currentUIManager.Init();
     }
 }

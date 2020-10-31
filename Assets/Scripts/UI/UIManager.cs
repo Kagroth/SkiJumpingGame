@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
 
     }
     
+    public GameObject hill;
     public Text hillInfo;
     
     public Text landingType;
