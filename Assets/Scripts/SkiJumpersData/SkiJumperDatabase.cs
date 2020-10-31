@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
-using UnityEditor;
 using System.Linq;
 
 public class SkiJumperDatabase
@@ -17,7 +16,6 @@ public class SkiJumperDatabase
         return skiJumpers;
     }
 
-    [MenuItem("Ski Jumpers/Generate ski jumpers file")]
     public static void GenerateSkiJumpersFile() {
         List<SkiJumper> skiJumpersToSave = new List<SkiJumper>();
         

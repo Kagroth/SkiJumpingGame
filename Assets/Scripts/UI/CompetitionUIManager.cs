@@ -80,7 +80,7 @@ public class CompetitionUIManager : UIManager
         skiJumperSimulator.SetHill(hill);
         competitionScrollPanelRecords = new List<GameObject>();
         skiJumpersResults = new List<CompetitionResult>();
-
+        SkiJumperDatabase.GenerateSkiJumpersFile();
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         
