@@ -19,8 +19,21 @@ public class CompetitionResultRecord : MonoBehaviour
     public void Render() {
         position.text = competitionResult.position.ToString();
         skiJumperName.text = competitionResult.skiJumper.skiJumperName;
-        firstJump.text = "0";
-        secondJump.text = "0";
-        resultPoints.text = "0";
+        resultPoints.text = competitionResult.points.ToString();
+
+        if (competitionResult.jumpResults[0] != null) {
+            firstJump.text = competitionResult.jumpResults[0].jumpDistance.ToString() + "m";
+        }
+
+        if (competitionResult.jumpResults[1] != null) {
+            secondJump.text = competitionResult.jumpResults[1].jumpDistance.ToString() + "m";
+        }
+
+        if (!competitionResult.skiJumper.isComputer) {
+            skiJumperName.color = new Color(0, 0, 255, 150);
+        }
+        else {
+            skiJumperName.color = Color.black;
+        }
     }    
 }
