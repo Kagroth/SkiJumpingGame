@@ -27,8 +27,9 @@ public class PlayerController : MonoBehaviour
     public GameObject skiJumperRagdoll;
 
     public delegate void SkiJumperStateChange();
-    public SkiJumperStateChange skiJumperEndJumpHandler;
     public SkiJumperStateChange skiJumperStartJumpHandler;
+    public SkiJumperStateChange skiJumperJumpFinishedHandler;
+    public SkiJumperStateChange skiJumperEndJumpHandler;
     
     private float bestDistance = 0;
 
@@ -50,19 +51,7 @@ public class PlayerController : MonoBehaviour
 
     public FallState fallState;
 
-    public struct JumpResultData {
-        public float jumpDistance;
-        public Judge[] judges;
-        public float jumpPoints;
-
-        public JumpResultData(float distance, Judge[] judgesArr, float points) {
-            jumpDistance = distance;
-            judges = judgesArr;
-            jumpPoints = points;
-        }
-    }
-
-    private JumpResultData jumpResultData;
+    private JumpResult jumpResultData;
 
     private void Awake()
     {
@@ -94,27 +83,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (InputManager.currentInputMode == InputManager.JUMP_FINISHED) {
+            if (Input.anyKey) {
+                skiJumperEndJumpHandler();
+            }
+        }
+
+        if (InputManager.currentInputMode != InputManager.SKI_JUMPER) {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.R))
         {
-            skiJumperBody.SetActive(true);
-
-            if (skiJumperRagdoll.activeInHierarchy)
-            {
-                skiJumperRagdoll.SetActive(false);
-                Destroy(skiJumperRagdoll);
-                skiJumperRagdoll = null;
-            }
-
-            playerRb.velocity = Vector2.zero;
-            playerRb.angularVelocity = 0f;
-            playerState.ChangeState(waitingForStart);
-            transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
-            transform.rotation = Quaternion.Euler(0, 0, -50);
-            // landingText.text = "Lądowanie:";
-            feetBone.localRotation = Quaternion.Euler(0, 0, 90);
-            kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
-            pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
-            skiJumperStartJumpHandler();
+            ResetSkiJumper();
             return;
         }
 
@@ -174,6 +155,28 @@ public class PlayerController : MonoBehaviour
         return skiJumperRagdollPrefab;
     }
 
+    public void ResetSkiJumper() {
+        skiJumperBody.SetActive(true);
+
+            if (skiJumperRagdoll.activeInHierarchy)
+            {
+                skiJumperRagdoll.SetActive(false);
+                Destroy(skiJumperRagdoll);
+                skiJumperRagdoll = null;
+            }
+
+            playerRb.velocity = Vector2.zero;
+            playerRb.angularVelocity = 0f;
+            playerState.ChangeState(waitingForStart);
+            transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
+            transform.rotation = Quaternion.Euler(0, 0, -50);
+            // landingText.text = "Lądowanie:";
+            feetBone.localRotation = Quaternion.Euler(0, 0, 90);
+            kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
+            pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
+            skiJumperStartJumpHandler();
+    }
+
     private float MeasureJumpDistance(Vector3 landedPosition)
     {
         BezierCurve bc = landingSlope.GetComponent<BezierCurve>();
@@ -224,7 +227,7 @@ public class PlayerController : MonoBehaviour
         return jumpDistance;
     }
 
-    public JumpResultData GetJumpResultData() {
+    public JumpResult GetJumpResultData() {
         return jumpResultData;
     }
     
@@ -303,9 +306,10 @@ public class PlayerController : MonoBehaviour
 
             jumpPoints = Mathf.Clamp(jumpPoints, 0, jumpPoints); // punkty za skok nie moga byc mniejsze niz 0
 
-            jumpResultData = new JumpResultData(jumpDistance, judges, jumpPoints);
+            jumpResultData = new JumpResult(jumpDistance, judges, jumpPoints);
             
-            skiJumperEndJumpHandler();
+            InputManager.SetInputMode(InputManager.JUMP_FINISHED);
+            skiJumperJumpFinishedHandler();
         }
     }
 
