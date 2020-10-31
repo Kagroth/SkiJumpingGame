@@ -32,4 +32,16 @@ public class CompetitionResult
 
         points += jr.jumpPoints;
     }
+
+    public static int Compare(CompetitionResult result1, CompetitionResult result2) {
+        if (result1.points > result2.points) {
+            return -1;
+        }
+        else if (result1.points == result2.points) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }
 }
