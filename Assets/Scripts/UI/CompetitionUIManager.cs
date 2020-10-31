@@ -59,6 +59,8 @@ public class CompetitionUIManager : UIManager
     public GameObject competitionScrollPanelRecordPrefab;
     private List<GameObject> competitionScrollPanelRecords;
 
+    private List<CompetitionResult> skiJumpersResults;
+
     private PlayerController playerController;
     // *************************************************
     
@@ -77,6 +79,8 @@ public class CompetitionUIManager : UIManager
         skiJumperSimulator = new SkiJumperSimulator();
         skiJumperSimulator.SetHill(hill);
         competitionScrollPanelRecords = new List<GameObject>();
+        skiJumpersResults = new List<CompetitionResult>();
+
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         
@@ -129,6 +133,7 @@ public class CompetitionUIManager : UIManager
     public void SwitchToCompetition() {
         View competitionView = views.Where(view => view.name.Equals("CompetitionView")).First();
         currentView.SwitchView(competitionView);
+        currentView = competitionView;
         windMeter = GetComponentInChildren<WindMeterUI>();
         windMeter.Init();
         InputManager.SetInputMode(InputManager.SKI_JUMPER);
@@ -167,18 +172,27 @@ public class CompetitionUIManager : UIManager
 
             // symulacja skoku komputera
             JumpResult computerResult = skiJumperSimulator.SimulateJump();
-            CompetitionResultRecord crr = competitionScrollPanelRecords[currentJumper].GetComponent<CompetitionResultRecord>();
-            crr.competitionResult.SetJumpResult(computerResult, currentSerie);
-            Debug.Log("Odleglosc komputera: " + computerResult.jumpDistance);
-            crr.resultPoints.text = crr.competitionResult.points.ToString() + "pkt";
+            skiJumpersResults[currentJumper].SetJumpResult(computerResult, currentSerie);
+            skiJumpersResults.Sort(CompetitionResult.Compare);
 
-            if (currentSerie == 1) {
+            Debug.Log("Sorted list: ");
+
+            foreach (CompetitionResult cr in skiJumpersResults) {
+                Debug.Log(cr.skiJumper.skiJumperName + " - " + cr.jumpResults[0].jumpDistance);
+            }
+
+            // CompetitionResultRecord crr = competitionScrollPanelRecords[currentJumper].GetComponent<CompetitionResultRecord>();
+            // crr.competitionResult.SetJumpResult(computerResult, currentSerie);
+            Debug.Log("Odleglosc komputera: " + computerResult.jumpDistance);
+            // crr.resultPoints.text = crr.competitionResult.points.ToString() + "pkt";
+
+            /* if (currentSerie == 1) {
                 crr.firstJump.text = crr.competitionResult.jumpResults[0].jumpDistance.ToString() + "m";
             }
             else {
                 crr.secondJump.text = crr.competitionResult.jumpResults[1].jumpDistance.ToString()+ "m";
-            }
-
+            } */
+            RenderResultList();
             currentJumper++;
 
             yield return new WaitForSeconds(0.5f);
@@ -186,13 +200,17 @@ public class CompetitionUIManager : UIManager
         }   
     }
 
-    private void NextState() {
+    private void NextState() {   
         Text playButtonText = currentView.viewPanel.GetComponentInChildren<Button>().gameObject.GetComponentInChildren<Text>();
         
-        if (currentJumper == competitionScrollPanelRecords.Count) {
+        if (currentJumper == competitionScrollPanelRecords.Count && currentSerie == 2) {
             competitionState = END_NEXT;
             playButtonText.text = "Zakończ";
             return;
+        }
+        else if (currentJumper == competitionScrollPanelRecords.Count) {
+            currentJumper = 0;
+            currentSerie++;
         }
 
         SetIsPlayerNext();
@@ -224,7 +242,6 @@ public class CompetitionUIManager : UIManager
         CompetitionResult competitionResult;
         CompetitionResultRecord competitionResultRecord;
 
-
         foreach (SkiJumper sj in skiJumpers) {
             record = Instantiate(competitionScrollPanelRecordPrefab, resultsScrollPanelContent.transform);
             competitionResult = new CompetitionResult(position, sj, 2);
@@ -233,24 +250,42 @@ public class CompetitionUIManager : UIManager
             competitionResultRecord.Render();
 
             competitionScrollPanelRecords.Add(record);
+            skiJumpersResults.Add(competitionResult);
             position++;
         }
 
         GameObject playerRecord = Instantiate(competitionScrollPanelRecordPrefab, resultsScrollPanelContent.transform);
-        SkiJumper player = new SkiJumper("Gracz Graczowy", "Polska", false);
+        SkiJumper player = new SkiJumper("Gracz", "Polska", false);
         CompetitionResult playerCr = new CompetitionResult(position, player, 2);
         CompetitionResultRecord playerCrpr = playerRecord.GetComponent<CompetitionResultRecord>();
         playerCrpr.SetCompetitionResult(playerCr);
         playerCrpr.Render();
 
         competitionScrollPanelRecords.Add(playerRecord);
+        skiJumpersResults.Add(playerCr);
+    }
+
+    public void RenderResultList() {
+        int index = 0;
+        CompetitionResultRecord crr;
+
+        foreach (CompetitionResult cr in skiJumpersResults) {
+            crr = competitionScrollPanelRecords[index].GetComponent<CompetitionResultRecord>();
+            cr.position = index + 1;
+            crr.SetCompetitionResult(cr);
+            crr.Render();
+            index++;
+        }
     }
 
     public void RenderPlayerResult() {
         JumpResult jr = playerController.GetJumpResultData();
         CompetitionResultRecord crr = competitionScrollPanelRecords[currentJumper].GetComponent<CompetitionResultRecord>();
         
-        crr.competitionResult.SetJumpResult(jr, currentSerie);
+        skiJumpersResults[currentJumper].SetJumpResult(jr, currentSerie);
+        skiJumpersResults.Sort(CompetitionResult.Compare);
+        
+        /* crr.competitionResult.SetJumpResult(jr, currentSerie);
         crr.resultPoints.text = crr.competitionResult.points.ToString() + "pkt";
 
         if (currentSerie == 1) {
@@ -258,8 +293,9 @@ public class CompetitionUIManager : UIManager
         }
         else {
             crr.secondJump.text = crr.competitionResult.jumpResults[1].jumpDistance.ToString()+ "m";
-        }
+        } */
 
+        RenderResultList();
         currentJumper++;
     }
 
