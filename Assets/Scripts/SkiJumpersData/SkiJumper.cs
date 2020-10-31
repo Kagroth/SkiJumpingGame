@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkiJumper : MonoBehaviour
+[System.Serializable]
+public class SkiJumper
 {
     public string skiJumperName;
     public string country;
