@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class SkiJumperSimulator : MonoBehaviour
+public class SkiJumperSimulator
 {
     private HillData hillData;
     private Transform hillIdealTakeOffPoint;
@@ -16,25 +16,13 @@ public class SkiJumperSimulator : MonoBehaviour
 
     private float windBias = 0.25f;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void SetHill(GameObject hill) {
         hillData = hill.GetComponent<Hill>().hillData;
         hillIdealTakeOffPoint = GameObject.FindGameObjectWithTag("IdealTakeOffPoint").GetComponent<Transform>();
         windAreas = hill.GetComponentsInChildren<WindArea>();   
     }
 
-    public void SimulateJump(SkiJumperComputer skiJumperComputer) {
+    public JumpResult SimulateJump() {
         float takeOffStr = maxTakeOffStrength - Random.Range(0, 3f);
         
         takeOffStr = Mathf.Clamp(takeOffStr, minTakeOffStrength, maxTakeOffStrength);
@@ -92,20 +80,23 @@ public class SkiJumperSimulator : MonoBehaviour
         
         Debug.Log("Odleglosc: " + jumpDistance);
 
-        skiJumperComputer.jumpResultData.jumpDistance = jumpDistance;
-        skiJumperComputer.jumpResultData.judges = GenerateJudgeNotes(jumpDistance);
+        JumpResult jumpResult = new JumpResult();
+        jumpResult.jumpDistance = jumpDistance;
+        jumpResult.judges = GenerateJudgeNotes(jumpDistance);
 
-        float jumpStylePoints = skiJumperComputer.jumpResultData.judges[1].GetJumpStylePoints() + 
-                                skiJumperComputer.jumpResultData.judges[2].GetJumpStylePoints() + 
-                                skiJumperComputer.jumpResultData.judges[3].GetJumpStylePoints();
+        float jumpStylePoints = jumpResult.judges[1].GetJumpStylePoints() + 
+                                jumpResult.judges[2].GetJumpStylePoints() + 
+                                jumpResult.judges[3].GetJumpStylePoints();
        
         float distancePoints = CalculateDistancePoints(hillData, jumpDistance);
 
-        skiJumperComputer.jumpResultData.jumpPoints = jumpStylePoints + distancePoints;
+        jumpResult.jumpPoints = jumpStylePoints + distancePoints;
 
         System.Random rnd = new System.Random();
     
-        skiJumperComputer.jumpResultData.judges = skiJumperComputer.jumpResultData.judges.OrderBy(judge => rnd.Next()).ToArray();
+        jumpResult.judges = jumpResult.judges.OrderBy(judge => rnd.Next()).ToArray();
+
+        return jumpResult;
     }
 
     private bool HasLanded(float jumpDistance, float rand) {
