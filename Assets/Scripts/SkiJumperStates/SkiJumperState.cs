@@ -34,7 +34,9 @@ public class SkiJumperState
     }
 
     public virtual void HandleUpdate() {
-
+        if (InputManager.currentInputMode != InputManager.SKI_JUMPER) {
+            return;
+        }
     }
 
     public virtual void PhysicsUpdate() {

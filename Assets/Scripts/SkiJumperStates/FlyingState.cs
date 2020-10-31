@@ -41,6 +41,7 @@ public class FlyingState : SkiJumperState
 
     public override void HandleUpdate()
     {
+        base.HandleUpdate();
         if (isAnimationEnter) {
             Debug.Log("Animacja runningUp -> flying");
 
