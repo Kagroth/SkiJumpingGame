@@ -68,7 +68,7 @@ public class SkiJumperSimulator
         jumpDistance = Mathf.Floor(jumpDistance);
         jumpDistance += distanceToAdd;
 
-        Debug.Log("TakeOffStr: " + takeOffStr);        
+        /* Debug.Log("TakeOffStr: " + takeOffStr);        
         Debug.Log("BodyToSkisTiltCoeff: " + bodyToSkisTilfCoeff);
         Debug.Log("SkiJumperTiltCoeff: " + skiJumperTiltCoeff);
         Debug.Log("Flight coeff: " + flightCoeff);
@@ -78,7 +78,7 @@ public class SkiJumperSimulator
         Debug.Log("HS * jumpCoeff: " + hillData.hsPoint * jumpCoeff);
         Debug.Log("(HS - K) * windCoeff: " + (hillData.hsPoint - hillData.kPoint) * windCoeff);
         
-        Debug.Log("Odleglosc: " + jumpDistance);
+        Debug.Log("Odleglosc: " + jumpDistance); */
 
         JumpResult jumpResult = new JumpResult();
         jumpResult.jumpDistance = jumpDistance;
