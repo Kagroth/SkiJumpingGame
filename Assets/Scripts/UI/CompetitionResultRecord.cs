@@ -20,13 +20,18 @@ public class CompetitionResultRecord : MonoBehaviour
         position.text = competitionResult.position.ToString();
         skiJumperName.text = competitionResult.skiJumper.skiJumperName;
         resultPoints.text = competitionResult.points.ToString();
-
+        
         if (competitionResult.jumpResults[0] != null) {
             firstJump.text = competitionResult.jumpResults[0].jumpDistance.ToString() + "m";
         }
-
-        if (competitionResult.jumpResults[1] != null) {
-            secondJump.text = competitionResult.jumpResults[1].jumpDistance.ToString() + "m";
+        
+        if (competitionResult.jumpResults.Count == 2) {
+            if (competitionResult.jumpResults[1] != null) {
+                secondJump.text = competitionResult.jumpResults[1].jumpDistance.ToString() + "m";
+            }
+        }
+        else {
+            secondJump.text = "-";
         }
 
         if (!competitionResult.skiJumper.isComputer) {
