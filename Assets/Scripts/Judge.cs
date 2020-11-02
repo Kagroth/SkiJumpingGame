@@ -55,7 +55,6 @@ public class Judge
 
     private void RandomizePoints() {
         float random = Random.Range(0f, 1f);
-        Debug.Log("RANDOM: " + random);
         float chunk = 0;
 
         if (random >= 0.67f) {
