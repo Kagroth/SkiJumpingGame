@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class CompetitionResultRecord : MonoBehaviour
 {
+    public bool faded = false;
     public Text position;
     public Text skiJumperName;
     public Text firstJump;
@@ -16,7 +17,20 @@ public class CompetitionResultRecord : MonoBehaviour
         competitionResult = cr;
     }
 
+    public void SetFade(bool fade) {
+        faded = fade;
+    }
+
+    public void SetColor(Color newColor) {
+        position.color      = newColor;
+        skiJumperName.color = newColor;
+        firstJump.color     = newColor;
+        secondJump.color    = newColor;
+        resultPoints.color  = newColor;
+    }
+
     public void Render() {
+
         position.text = competitionResult.position.ToString();
         skiJumperName.text = competitionResult.skiJumper.skiJumperName;
         resultPoints.text = competitionResult.points.ToString();
@@ -35,10 +49,22 @@ public class CompetitionResultRecord : MonoBehaviour
         }
 
         if (!competitionResult.skiJumper.isComputer) {
-            skiJumperName.color = new Color(0, 0, 255, 150);
+            if (faded) {
+                SetColor(new Color(0, 0, 200));
+            }
+            else {
+                SetColor(Color.blue);
+            }
         }
         else {
-            skiJumperName.color = Color.black;
+            if (faded) {
+                SetColor(Color.grey);                
+            }
+            else {
+                SetColor(Color.black);
+            }
         }
+
+        
     }    
 }
