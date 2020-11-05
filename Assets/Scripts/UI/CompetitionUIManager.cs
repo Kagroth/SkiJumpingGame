@@ -58,6 +58,7 @@ public class CompetitionUIManager : UIManager
 
     public GameObject competitionScrollPanelRecordPrefab;
     private List<GameObject> competitionScrollPanelRecords;
+    private List<CompetitionResultRecord> competitionResultRecords; 
     // *************************************************
     
     // Ski Jumpers Lists    
@@ -104,12 +105,13 @@ public class CompetitionUIManager : UIManager
         skiJumperSimulator = new SkiJumperSimulator();
         skiJumperSimulator.SetHill(hill);
         
+        competitionResultRecords      = new List<CompetitionResultRecord>();
         startList                     = new List<CompetitionResult>();
         competitionResults            = new List<CompetitionResult>();
         qualificationsResults         = new List<CompetitionResult>();
-        competitionScrollPanelRecords = new List<GameObject>(); 
+        competitionScrollPanelRecords = new List<GameObject>();
+        skiJumpersList                = new List<SkiJumper>();
 
-        skiJumpersList = new List<SkiJumper>();
         SkiJumperDatabase.GenerateSkiJumpersFile();
         skiJumpersList = SkiJumperDatabase.LoadSkiJumpers();
 
@@ -166,11 +168,8 @@ public class CompetitionUIManager : UIManager
             return false;
         }
 
-        listOne.Sort(CompetitionResult.Compare);
-        listTwo.Sort(CompetitionResult.Compare);
-
         for (int index = 0; index < listOne.Count; index++) {
-            if (listOne[index].Equals(listTwo[index])) {
+            if (listOne.Contains(listTwo[index])) {
                 continue;
             }
 
@@ -224,12 +223,12 @@ public class CompetitionUIManager : UIManager
         currentView.SwitchView(competitionInfo);
         currentView = competitionInfo;
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
-        RenderPlayerResult();
+        SetPlayerResult();
+        RenderResultList();
+        NextJumper();
         NextState();
     }
-
     private void StartQualification() {
-        // rozpoczecie kwalifikacji
         CreateQualificationList();
         competitionState = QUALIFICATION_ROUND;
         currentContextResults = qualificationsResults;
@@ -239,6 +238,7 @@ public class CompetitionUIManager : UIManager
     private void StartCompetition() {
         competitionState = COMPETITION_ROUND;
         CreateCompetitionList();
+        FadeResultRecords(50);
         ResetNextJumperPointer();
         currentSerie = 1;
         currentContextResults = competitionResults;
@@ -250,8 +250,15 @@ public class CompetitionUIManager : UIManager
     private void StartNextCompetitionRound() {
         currentSerie++;
         CreateSecondRoundCompetitionList();
+        FadeResultRecords(30);
+        // tu jest problem
         ResetNextJumperPointer();
         RenderResultList();
+        // tu sie konczy problem
+
+        for (int index = 0; index < competitionResultRecords.Count; index++) {
+            Debug.Log((index + 1) + " - " + competitionResultRecords[index].faded);
+        }
         Debug.Log("currentJumper pointer przed 2 seria: " + currentJumper);
     }
 
@@ -289,26 +296,17 @@ public class CompetitionUIManager : UIManager
 
         while (roundState == COMPUTER_NEXT) {
             computerResult = skiJumperSimulator.SimulateJump();
-            Debug.Log("SimulateComputerJump method, currentJumper: " + currentJumper);
-            Debug.Log("SimulateComputerJump method, currentContextResultsCount: " + currentContextResults.Count);
             startList[currentJumper].SetJumpResult(computerResult, currentSerie);
-            // currentContextResults[currentJumper].SetJumpResult(computerResult, currentSerie);
             currentContextResults.Sort(CompetitionResult.Compare);
 
             RenderResultList();
             NextJumper();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
             NextState();
         }
 
         yield break;  
-    }
-
-    private void ResetNextJumperPointer() {
-        currentJumper = 0;
-        completedJumps = 0;
-        jumperPointerMoveDirection = 1;
     }
 
     private void NextJumper() {
@@ -366,6 +364,7 @@ public class CompetitionUIManager : UIManager
             competitionResultRecord.Render();
 
             competitionScrollPanelRecords.Add(record);
+            competitionResultRecords.Add(competitionResultRecord);
         }
 
         GameObject playerRecord = Instantiate(competitionScrollPanelRecordPrefab, resultsScrollPanelContent.transform);
@@ -376,35 +375,43 @@ public class CompetitionUIManager : UIManager
         playerCrpr.Render();
 
         competitionScrollPanelRecords.Add(playerRecord);
+        competitionResultRecords.Add(playerCrpr);
         currentContextResults.Add(playerCr);
         startList.Add(playerCr);
     }
 
-    public void RenderResultList() {
-        int index = 0;
-        CompetitionResultRecord crr;
+    private void FadeResultRecords(int from) {
+        if (from >= competitionResultRecords.Count) {
+            return;
+        }
 
-        foreach (CompetitionResult cr in currentContextResults) {
-            crr = competitionScrollPanelRecords[index].GetComponent<CompetitionResultRecord>();
-            cr.position = index + 1;
-            crr.SetCompetitionResult(cr);
-            crr.Render();
-            index++;
+        for (int index = from; index < competitionResultRecords.Count; index++) {
+            competitionResultRecords[index].SetFade(true);
+            competitionResultRecords[index].Render();
+        }
+
+        for (int index = 0; index < competitionResultRecords.Count; index++) {
+            Debug.Log((index + 1) + " - " + competitionResultRecords[index].faded);
+        }
+    }
+    
+    private void FadeResultRecords(int from, int to) {
+        for (int index = from; index < to; index++) {
+            competitionResultRecords[index].SetFade(true);
+            competitionResultRecords[index].Render();
         }
     }
 
-    public void RenderPlayerResult() {
-        JumpResult jr = playerController.GetJumpResultData();
-        // CompetitionResultRecord crr = competitionScrollPanelRecords[currentJumper].GetComponent<CompetitionResultRecord>();
-        
-        //currentContextResults[currentJumper].SetJumpResult(jr, currentSerie);
-        startList[currentJumper].SetJumpResult(jr, currentSerie);
-        currentContextResults.Sort(CompetitionResult.Compare);
+    public void RenderResultList() {
+        int index = 0;
 
-        RenderResultList();
-        NextJumper();
+        foreach (CompetitionResult cr in currentContextResults) {
+            cr.position = index + 1;
+            competitionResultRecords[index].SetCompetitionResult(cr);
+            competitionResultRecords[index].Render();
+            index++;
+        }
     }
-
 
     private void InitCompetitionList(List<SkiJumper> skiJumpersListSource, List<CompetitionResult> outputList, int seriesCount) {
         int index = 1;
@@ -419,21 +426,16 @@ public class CompetitionUIManager : UIManager
     private void CreateQualificationList() {
         InitCompetitionList(skiJumpersList, qualificationsResults, qualificationSeriesCount);
         CopyList(qualificationsResults, startList);
-
-        Debug.Assert(!ListReferenceEquals(qualificationsResults, startList), "To te same listy!");
-        Debug.Assert(ListContentEquals(qualificationsResults, startList), "startList i qualificationsResults nie posiadaja tych samych elementow!");
     }
 
     private void CreateCompetitionList() {
-        qualificationsResults.Sort(CompetitionResult.Compare);
         int qualifiedSkiJumpersCount = qualificationsResults.Count < 50 ? qualificationsResults.Count : 50;
         List<CompetitionResult> qualifiedSkiJumpersResults = qualificationsResults.GetRange(0, qualifiedSkiJumpersCount);        
+        qualifiedSkiJumpersResults.Sort(CompetitionResult.Compare);
         qualifiedSkiJumpersResults.Reverse();
         skiJumpersList = qualifiedSkiJumpersResults.Select(cr => cr.skiJumper).ToList();
         InitCompetitionList(skiJumpersList, competitionResults, competitionSeriesCount);
         CopyList(competitionResults, startList);
-        
-        Debug.Assert(ListContentEquals(competitionResults, startList), "startList i competitionResults nie posiadaja tych samych elementow!");
     }
 
     private void CreateSecondRoundCompetitionList() {
@@ -442,10 +444,20 @@ public class CompetitionUIManager : UIManager
         List<CompetitionResult> secondRoundResults = competitionResults.GetRange(0, secondRoundJumpersCount);
         CopyList(secondRoundResults, startList);
 
-        Debug.Assert(ListContentEquals(competitionResults, startList), "startList i competitionResults nie posiadaja tych samych elementow!");
         startList.Reverse();
     }
+    private void ResetNextJumperPointer() {
+        currentJumper = 0;
+        completedJumps = 0;
+        jumperPointerMoveDirection = 1;
+    }
+    public void SetPlayerResult() {
+        JumpResult jr = playerController.GetJumpResultData();
 
+        startList[currentJumper].SetJumpResult(jr, currentSerie);
+        currentContextResults.Sort(CompetitionResult.Compare);
+    }
+    
     // Update is called once per frame
     void Update()
     {
