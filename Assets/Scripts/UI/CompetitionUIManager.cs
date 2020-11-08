@@ -35,10 +35,16 @@ public class CompetitionUIManager : UIManager
     private Text distanceValue;
 
     [SerializeField]
-    private Text resultValue;
+    private Text jumpPoints;
+
+    [SerializeField]
+    private Text resultPoints;
 
     [SerializeField]
     private Text[] judgePoints; 
+
+    [SerializeField]
+    private Text position;
 
     private bool helpPanelShow;
 
@@ -180,10 +186,15 @@ public class CompetitionUIManager : UIManager
     }
 
     public void ShowJumpResultPanel() {
+        SetPlayerResult();
+        RenderResultList();
+
         JumpResult jrd = playerController.GetJumpResultData();
         distanceValue.text = jrd.jumpDistance.ToString();
-        resultValue.text = jrd.jumpPoints.ToString();
-        
+        jumpPoints.text = jrd.jumpPoints.ToString();
+        resultPoints.text = startList[currentJumper].points.ToString();
+        position.text = startList[currentJumper].position.ToString();
+
         for(int index = 0; index < judgePoints.Length; index++) {
             judgePoints[index].text = jrd.judges[index].GetJumpStylePoints().ToString();
             
@@ -223,8 +234,6 @@ public class CompetitionUIManager : UIManager
         currentView.SwitchView(competitionInfo);
         currentView = competitionInfo;
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
-        SetPlayerResult();
-        RenderResultList();
         NextJumper();
         NextState();
     }
@@ -251,10 +260,8 @@ public class CompetitionUIManager : UIManager
         currentSerie++;
         CreateSecondRoundCompetitionList();
         FadeResultRecords(30);
-        // tu jest problem
         ResetNextJumperPointer();
         RenderResultList();
-        // tu sie konczy problem
 
         for (int index = 0; index < competitionResultRecords.Count; index++) {
             Debug.Log((index + 1) + " - " + competitionResultRecords[index].faded);
@@ -368,8 +375,8 @@ public class CompetitionUIManager : UIManager
         }
 
         GameObject playerRecord = Instantiate(competitionScrollPanelRecordPrefab, resultsScrollPanelContent.transform);
-        SkiJumper player = new SkiJumper("Gracz", "Polska", false);
-        CompetitionResult playerCr = new CompetitionResult(currentContextResults.Count, player, currentContextSeriesCount);
+        SkiJumper player = new SkiJumper("Gracz", Country.POLAND, false);
+        CompetitionResult playerCr = new CompetitionResult(currentContextResults.Count, currentContextResults.Count + 1, player, currentContextSeriesCount);
         CompetitionResultRecord playerCrpr = playerRecord.GetComponent<CompetitionResultRecord>();
         playerCrpr.SetCompetitionResult(playerCr);
         playerCrpr.Render();
@@ -394,13 +401,6 @@ public class CompetitionUIManager : UIManager
             Debug.Log((index + 1) + " - " + competitionResultRecords[index].faded);
         }
     }
-    
-    private void FadeResultRecords(int from, int to) {
-        for (int index = from; index < to; index++) {
-            competitionResultRecords[index].SetFade(true);
-            competitionResultRecords[index].Render();
-        }
-    }
 
     public void RenderResultList() {
         int index = 0;
@@ -417,7 +417,7 @@ public class CompetitionUIManager : UIManager
         int index = 1;
 
         foreach(SkiJumper sj in skiJumpersListSource) {
-            CompetitionResult cr = new CompetitionResult(index, sj, seriesCount);
+            CompetitionResult cr = new CompetitionResult(index, index, sj, seriesCount);
             outputList.Add(cr);
             index++;
         }
