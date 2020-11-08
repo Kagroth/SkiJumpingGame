@@ -5,6 +5,9 @@ using System.Linq;
 public class CompetitionResult
 {
     public int position;
+
+    public int bib;
+
     public SkiJumper skiJumper;
     public List<JumpResult> jumpResults;
     public float points;
@@ -15,8 +18,9 @@ public class CompetitionResult
 
     }
 
-    public CompetitionResult(int pos, SkiJumper jumperToSet, int series) {
+    public CompetitionResult(int pos, int bibNumer, SkiJumper jumperToSet, int series) {
         position = pos;
+        bib = bibNumer;
         skiJumper = jumperToSet;
         jumpResults = new List<JumpResult>();
         points = 0;
@@ -38,7 +42,15 @@ public class CompetitionResult
             return -1;
         }
         else if (result1.points == result2.points) {
-            return 0;
+            if (result1.bib > result2.bib) {
+                return 1;
+            }
+            else if (result1.bib < result2.bib) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
         }
         else {
             return 1;
