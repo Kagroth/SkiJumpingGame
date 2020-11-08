@@ -60,17 +60,15 @@ public class PlayerController : MonoBehaviour
         idealTakeOffPoint = GameObject.FindGameObjectWithTag("IdealTakeOffPoint").GetComponent<Transform>();
         landingSlope = GameObject.FindGameObjectWithTag("LandingSlope");
 
-        playerState = new StateMachine();
+        playerState     = new StateMachine();
         waitingForStart = new WaitingForStartState(this.gameObject, playerState);
-        runningUpState = new RunningUpState(this.gameObject, playerState);
-        takeOffState = new TakeOffState(this.gameObject, playerState);
-        flyingState = new FlyingState(this.gameObject, playerState);
-        landingState = new LandingState(this.gameObject, playerState);
-        landedState = new LandedState(this.gameObject, playerState);
-        fallState = new FallState(this.gameObject, playerState);
+        runningUpState  = new RunningUpState(this.gameObject, playerState);
+        takeOffState    = new TakeOffState(this.gameObject, playerState);
+        flyingState     = new FlyingState(this.gameObject, playerState);
+        landingState    = new LandingState(this.gameObject, playerState);
+        landedState     = new LandedState(this.gameObject, playerState);
+        fallState       = new FallState(this.gameObject, playerState);
 
-        //judges = new Judge[5];
-        
         playerState.ChangeState(waitingForStart);
     }
 
@@ -158,23 +156,22 @@ public class PlayerController : MonoBehaviour
     public void ResetSkiJumper() {
         skiJumperBody.SetActive(true);
 
-            if (skiJumperRagdoll.activeInHierarchy)
-            {
-                skiJumperRagdoll.SetActive(false);
-                Destroy(skiJumperRagdoll);
-                skiJumperRagdoll = null;
-            }
+        if (skiJumperRagdoll.activeInHierarchy)
+        {
+            skiJumperRagdoll.SetActive(false);
+            Destroy(skiJumperRagdoll);
+            skiJumperRagdoll = null;
+        }
 
-            playerRb.velocity = Vector2.zero;
-            playerRb.angularVelocity = 0f;
-            playerState.ChangeState(waitingForStart);
-            transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
-            transform.rotation = Quaternion.Euler(0, 0, -50);
-            // landingText.text = "Lądowanie:";
-            feetBone.localRotation = Quaternion.Euler(0, 0, 90);
-            kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
-            pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
-            skiJumperStartJumpHandler();
+        playerRb.velocity = Vector2.zero;
+        playerRb.angularVelocity = 0f;
+        playerState.ChangeState(waitingForStart);
+        transform.position = startingPoint.position - new Vector3(0, 1.5f, 0);
+        transform.rotation = Quaternion.Euler(0, 0, -50);
+        feetBone.localRotation = Quaternion.Euler(0, 0, 90);
+        kneeBone.localRotation = Quaternion.Euler(0, 0, 0);
+        pelvisBone.localRotation = Quaternion.Euler(0, 0, 0);
+        skiJumperStartJumpHandler();
     }
 
     private float MeasureJumpDistance(Vector3 landedPosition)
