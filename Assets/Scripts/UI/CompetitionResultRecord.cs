@@ -7,6 +7,8 @@ public class CompetitionResultRecord : MonoBehaviour
 {
     public bool faded = false;
     public Text position;
+    public Text bibNumer;
+    public Image countryFlag;
     public Text skiJumperName;
     public Text firstJump;
     public Text secondJump;
@@ -15,6 +17,9 @@ public class CompetitionResultRecord : MonoBehaviour
 
     public void SetCompetitionResult(CompetitionResult cr) {
         competitionResult = cr;
+        bibNumer.text = cr.bib.ToString();
+        Debug.Log("Kraj: " + cr.skiJumper.country);
+        countryFlag.sprite = Resources.Load<Sprite>("Sprites/Country Flags/" + cr.skiJumper.country);
     }
 
     public void SetFade(bool fade) {
@@ -23,6 +28,7 @@ public class CompetitionResultRecord : MonoBehaviour
 
     public void SetColor(Color newColor) {
         position.color      = newColor;
+        bibNumer.color      = newColor;
         skiJumperName.color = newColor;
         firstJump.color     = newColor;
         secondJump.color    = newColor;
