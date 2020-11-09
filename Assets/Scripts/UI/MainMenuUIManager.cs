@@ -1,18 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Linq;
+using UnityEngine.SceneManagement;
 public class MainMenuUIManager : UIManager
 {
-    // Start is called before the first frame update
-    void Start()
+    public View[] views;
+
+    private View currentView;
+
+    public override void Init()
     {
+        currentView = views.Where(view => view.name.Equals("MainMenuView")).First();
+        currentView.Show();
+    }
+
+    public void SwitchView(string viewToShowName) {
+        View viewToShow = views.Where(view => view.name.Equals(viewToShowName)).First();
+        currentView.SwitchView(viewToShow);
+        currentView = viewToShow;
+    }
+    public void StartRandomCompetition() {
+        SceneManager.LoadScene("RandomCompetition");
+    }
+
+    private void Start() {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    private void Update() {
         
     }
 }
