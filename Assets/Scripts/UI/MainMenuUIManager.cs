@@ -24,6 +24,12 @@ public class MainMenuUIManager : UIManager
         SceneManager.LoadScene("RandomCompetition");
     }
 
+    public void StartQuickWorldCup() {
+        WorldCupData.CreateQuickWorldCup();
+
+        SceneManager.LoadScene("WorldCup");
+    }
+
     private void Start() {
         
     }
