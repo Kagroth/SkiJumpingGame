@@ -6,21 +6,6 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 public class CompetitionUIManager : UIManager
 {
-    [System.Serializable]
-    public struct View {
-        public string name;
-        public GameObject viewPanel;
-
-        public void SwitchView(View viewToShow) {
-            viewPanel.SetActive(false);
-            viewToShow.viewPanel.SetActive(true);
-        }
-
-        public void Show() {
-            viewPanel.SetActive(true);
-        }
-    } 
-
     public View[] views;
 
     private View currentView;
