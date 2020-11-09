@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     public SceneUI[] sceneUIPrefabs; 
 
+    public HillData[] allHills;
+
     public static GameObject hillPrefab;
     public GameObject skiJumperPrefab;
     private GameObject hill;
@@ -33,7 +35,19 @@ public class GameManager : MonoBehaviour
     }
 
     public void InitScene() {
-        if (SceneManager.GetActiveScene().name.Equals("Competition")) {
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        if (currentScene.Equals("RandomCompetition")) {
+            int hillIndex = Random.Range(0, allHills.Length);
+            Debug.Log("Hill index to load" + hillIndex);
+            HillData hillData = allHills[hillIndex];
+            hillPrefab = Resources.Load<GameObject>("Hills/" + hillData.name);
+            hill = Instantiate(hillPrefab);
+            GameObject player = Instantiate(skiJumperPrefab);
+            PlayerController pc = player.GetComponent<PlayerController>();
+
+        }
+        else if (currentScene.Equals("Competition")) {
             if (!hillPrefab) {
                 hillPrefab = Resources.Load<GameObject>("Hills/Fly-HS215");                
             }
