@@ -103,8 +103,12 @@ public class CompetitionUIManager : UIManager
         competitionScrollPanelRecords = new List<GameObject>();
         skiJumpersList                = new List<SkiJumper>();
 
-        SkiJumperDatabase.GenerateSkiJumpersFile();
-        skiJumpersList = SkiJumperDatabase.LoadSkiJumpers();
+        if (WorldCupData.worldCupClassification != null) {
+            skiJumpersList = WorldCupData.worldCupClassification.Select(wcsjr => wcsjr.skiJumper).ToList();
+        }
+        else {
+            skiJumpersList = SkiJumperDatabase.LoadSkiJumpers();
+        }
 
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
@@ -270,7 +274,8 @@ public class CompetitionUIManager : UIManager
             else if (competitionState == COMPETITION_ROUND) {
                 if (currentSerie == currentContextSeriesCount) {
                     // zakoncz konkurs
-                    SceneManager.LoadScene("MainMenu");
+                    WorldCupData.FinishCompetition(currentContextResults);
+                    SceneManager.LoadScene("WorldCup");
                     return;
                 }
                 else {
