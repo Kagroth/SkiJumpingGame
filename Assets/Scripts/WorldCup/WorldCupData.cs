@@ -1,9 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class WorldCupData
 {
+    public static List<int> pointsMatrix = new List<int>() {
+        100, 80, 60, 50, 45, 40, 36, 32, 29, 26, 24, 22, 20, 18, 16,
+        15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+    };
+
     public static List<WorldCupCompetition> worldCupCompetitions;
     public static List<SkiJumper> worldCupParticipants;
 
@@ -17,6 +23,7 @@ public class WorldCupData
 
     public static void CreateQuickWorldCup() {
         currentCompetition = 0;
+        SkiJumperDatabase.GenerateSkiJumpersFile();
         worldCupParticipants = SkiJumperDatabase.LoadSkiJumpers();
         worldCupClassification = new List<WorldCupSkiJumperResult>();
 
@@ -36,5 +43,21 @@ public class WorldCupData
 
     public static void NextCompetiion() {
         currentCompetition++;
+    }
+
+    public static void FinishCompetition(List<CompetitionResult> competitionResults) {
+        worldCupCompetitions[currentCompetition].completed = true;
+
+        worldCupCompetitions[currentCompetition].SetResults(competitionResults);
+
+        for (int index = 0; index < 30; index++) {
+            int pointsToAdd = pointsMatrix[index];
+            SkiJumper skiJumperToFind = competitionResults[index].skiJumper;
+            WorldCupSkiJumperResult wcsjr = worldCupClassification.Where(wcc => wcc.skiJumper.Equals(skiJumperToFind)).First();
+            wcsjr.points += pointsToAdd;
+            Debug.Log("Punkty skoczka " + wcsjr.skiJumper.skiJumperName + " po konkursie: " + wcsjr.points);
+        }
+
+        NextCompetiion();
     }
 }
