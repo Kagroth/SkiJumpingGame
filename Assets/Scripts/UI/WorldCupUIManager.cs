@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 public class WorldCupUIManager : UIManager
 {
+    public GameObject nextCompetitionButton;
+
     // Competition List Panel
     public GameObject competitionListPanelContent;
 
@@ -28,7 +30,7 @@ public class WorldCupUIManager : UIManager
     {
         base.Init();
         // temporary
-        WorldCupData.CreateQuickWorldCup();
+        // WorldCupData.CreateQuickWorldCup();
         // *********
         
         competitionListPanelRecords = new List<GameObject>();
@@ -41,6 +43,8 @@ public class WorldCupUIManager : UIManager
         
         List<WorldCupCompetition> worldCupCompetitions = WorldCupData.worldCupCompetitions;
         List<WorldCupSkiJumperResult> worldCupSkiJumperResults = WorldCupData.worldCupClassification;
+        
+        worldCupSkiJumperResults.Sort(WorldCupSkiJumperResult.Compare);
 
         int index = 1;
 
@@ -64,10 +68,21 @@ public class WorldCupUIManager : UIManager
             classificationListRecords.Add(wccr);
             index++;
         }
+
+        if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
+            Text playButtonText = nextCompetitionButton.GetComponentInChildren<Text>();
+            playButtonText.text = "Zakończ puchar";
+        }
     }
 
     public void StartCompetition() {
+        if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
+            SceneManager.LoadScene("MainMenu");
+            return;
+        }
+
         SceneManager.LoadScene("Competition");
+        return;
     }
 
     // Start is called before the first frame update
