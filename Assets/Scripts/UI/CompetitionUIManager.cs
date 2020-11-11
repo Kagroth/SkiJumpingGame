@@ -363,18 +363,6 @@ public class CompetitionUIManager : UIManager
             competitionScrollPanelRecords.Add(record);
             competitionResultRecords.Add(competitionResultRecord);
         }
-
-        GameObject playerRecord = Instantiate(competitionScrollPanelRecordPrefab, resultsScrollPanelContent.transform);
-        SkiJumper player = new SkiJumper("Gracz", Country.POLAND, false);
-        CompetitionResult playerCr = new CompetitionResult(currentContextResults.Count, currentContextResults.Count + 1, player, currentContextSeriesCount);
-        CompetitionResultRecord playerCrpr = playerRecord.GetComponent<CompetitionResultRecord>();
-        playerCrpr.SetCompetitionResult(playerCr);
-        playerCrpr.Render();
-
-        competitionScrollPanelRecords.Add(playerRecord);
-        competitionResultRecords.Add(playerCrpr);
-        currentContextResults.Add(playerCr);
-        startList.Add(playerCr);
     }
 
     private void FadeResultRecords(int from) {

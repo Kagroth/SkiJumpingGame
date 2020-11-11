@@ -13,6 +13,8 @@ public class SkiJumperDatabase
         List<SkiJumper> skiJumpers = (List<SkiJumper>) bf.Deserialize(file);
         file.Close();
 
+        skiJumpers.Add(new SkiJumper("Gracz", Country.POLAND, false));
+
         return skiJumpers;
     }
 

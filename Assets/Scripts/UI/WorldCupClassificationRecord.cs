@@ -15,5 +15,18 @@ public class WorldCupClassificationRecord : MonoBehaviour
         skiJumperName.text = worldCupSkiJumperResult.skiJumper.skiJumperName;
         countryFlag.sprite = Resources.Load<Sprite>("Sprites/Country Flags/" + worldCupSkiJumperResult.skiJumper.country);
         points.text = worldCupSkiJumperResult.points.ToString();
+
+        if (worldCupSkiJumperResult.skiJumper.isComputer) {
+            SetColor(Color.black);
+        }
+        else {
+            SetColor(new Color(0, 0, 200));
+        }
+    }
+    
+    public void SetColor(Color newColor) {
+        position.color      = newColor;
+        skiJumperName.color = newColor;
+        points.color        = newColor;
     }
 }
