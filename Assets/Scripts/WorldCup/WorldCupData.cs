@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class WorldCupData
+public static class WorldCupData
 {
     public static List<int> pointsMatrix = new List<int>() {
         100, 80, 60, 50, 45, 40, 36, 32, 29, 26, 24, 22, 20, 18, 16,
