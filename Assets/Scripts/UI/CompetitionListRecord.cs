@@ -13,12 +13,24 @@ public class CompetitionListRecord : MonoBehaviour
     public void SetData(int pos, string newHillName, string newType) {
         position.text = pos.ToString();
         hillName.text = newHillName;
-        competitionType.text = newType;
-        completed = false;
+        // competitionType.text = newType;
+        SetColor(Color.black);
     }
 
     public void Complete() {
         completed = true;
+
+        SetColor(Color.green);
+    }
+
+    public void SetColor(Color newColor) {
+        position.color        = newColor;
+        hillName.color        = newColor;
+        competitionType.color = newColor;
+    }
+
+    private void Awake() {
+        completed = false;
     }
 
     // Start is called before the first frame update
