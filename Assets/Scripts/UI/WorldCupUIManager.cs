@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class WorldCupUIManager : UIManager
 {
+    public Text nextCompetitionLabel;
     public GameObject nextCompetitionButton;
 
     // Competition List Panel
@@ -52,6 +53,15 @@ public class WorldCupUIManager : UIManager
             GameObject go = Instantiate(competitionListPanelRecordPrefab, competitionListPanelContent.transform);
             CompetitionListRecord clr = go.GetComponent<CompetitionListRecord>();
             clr.SetData(index, wcc.hillName, "I");
+
+            if (wcc.completed) {
+                clr.Complete();
+            }
+            else if ((index - 1) == WorldCupData.currentCompetition) {
+                clr.SetColor(Color.yellow);
+                nextCompetitionLabel.text = "Następny konkurs: " + wcc.hillName;
+            }
+
             competitionListRecords.Add(clr);
             competitionListPanelRecords.Add(go);
             index++;
