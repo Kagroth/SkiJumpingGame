@@ -274,6 +274,11 @@ public class CompetitionUIManager : UIManager
             else if (competitionState == COMPETITION_ROUND) {
                 if (currentSerie == currentContextSeriesCount) {
                     // zakoncz konkurs
+                    if (WorldCupData.isRandomCompetition) {
+                        SceneManager.LoadScene("MainMenu");
+                        return;
+                    }
+                    
                     WorldCupData.FinishCompetition(currentContextResults);
                     SceneManager.LoadScene("WorldCup");
                     return;

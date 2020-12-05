@@ -21,6 +21,8 @@ public class MainMenuUIManager : UIManager
         currentView = viewToShow;
     }
     public void StartRandomCompetition() {
+        WorldCupData.CreateRandomCompetition();
+        
         SceneManager.LoadScene("RandomCompetition");
     }
 
