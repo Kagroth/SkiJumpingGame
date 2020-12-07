@@ -54,19 +54,13 @@ public class CompetitionUIManager : UIManager
     private List<CompetitionResultRecord> competitionResultRecords; 
     // *************************************************
     
-    // Ski Jumpers Lists    
-    private List<CompetitionResult> qualificationsResults;
-    private List<CompetitionResult> competitionResults;
+    // Ski Jumpers Lists
 
     private List<CompetitionResult> currentContextResults;
 
     private List<CompetitionResult> startList;
 
-    private List<SkiJumper> skiJumpersList;
     private PlayerController playerController;
-
-    private int qualificationSeriesCount;
-    private int competitionSeriesCount;
 
     private int currentContextSeriesCount;
 
@@ -98,22 +92,11 @@ public class CompetitionUIManager : UIManager
         
         competitionResultRecords      = new List<CompetitionResultRecord>();
         startList                     = new List<CompetitionResult>();
-        competitionResults            = new List<CompetitionResult>();
-        qualificationsResults         = new List<CompetitionResult>();
         competitionScrollPanelRecords = new List<GameObject>();
-        skiJumpersList                = new List<SkiJumper>();
-
-        if (WorldCupData.worldCupClassification != null) {
-            skiJumpersList = WorldCupData.worldCupClassification.Select(wcsjr => wcsjr.skiJumper).ToList();
-        }
-        else {
-            skiJumpersList = SkiJumperDatabase.LoadSkiJumpers();
-        }
         
         // ******************************************************************
         competition = WorldCupData.GetCurrentCompetition();
         competition.SetCompetitionParticipants(WorldCupData.GetWorldCupParticipants());
-        competition.StartQualification();
         CreateCompetitionResultRecords();
         RenderResultList();
         NextState();
@@ -124,14 +107,9 @@ public class CompetitionUIManager : UIManager
         HideJumpResultPanel();
         helpPanelShow = false;
         
-        playerController = GameObject.FindObjectOfType<PlayerController>();
-        playerController.skiJumperStartJumpHandler    += HideJumpResultPanel;
-        playerController.skiJumperJumpFinishedHandler += ShowJumpResultPanel;
-        playerController.skiJumperEndJumpHandler      += SwitchToInfo;
+        InitPlayerController();
 
         currentSerie = 1;
-        qualificationSeriesCount = 1;
-        competitionSeriesCount = 2;
 
         ResetNextJumperPointer();
         StartQualification();
@@ -142,44 +120,11 @@ public class CompetitionUIManager : UIManager
         currentView.Show();
     }
 
-    private void LogList(List<CompetitionResult> listToLog, string listName) {
-        string listStr = "";
-        listStr += "Lista startowa - " + listName +": \n"; 
-        listStr += "Liczba zawodników: " + listToLog.Count.ToString() + "\n";
-
-        foreach (CompetitionResult cr in listToLog) {
-            listStr += cr.skiJumper.skiJumperName + "\n";
-        }
-
-        Debug.Log(listStr);
-    }
-
-    private void CopyList(List<CompetitionResult> sourceList, List<CompetitionResult> destinationList) {
-        destinationList.Clear();
-
-        foreach (CompetitionResult cr in sourceList) {
-            destinationList.Add(cr);
-        }
-    }
-
-    private bool ListReferenceEquals(List<CompetitionResult> listOne, List<CompetitionResult> listTwo) {
-        return Object.ReferenceEquals(listOne, listTwo);
-    }
-
-    private bool ListContentEquals(List<CompetitionResult> listOne, List<CompetitionResult> listTwo) {
-        if (listOne.Count != listTwo.Count) {
-            return false;
-        }
-
-        for (int index = 0; index < listOne.Count; index++) {
-            if (listOne.Contains(listTwo[index])) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
+    public void InitPlayerController() {
+        playerController = GameObject.FindObjectOfType<PlayerController>();
+        playerController.skiJumperStartJumpHandler    += HideJumpResultPanel;
+        playerController.skiJumperJumpFinishedHandler += ShowJumpResultPanel;
+        playerController.skiJumperEndJumpHandler      += SwitchToInfo;
     }
 
     public void ShowJumpResultPanel() {
@@ -237,8 +182,8 @@ public class CompetitionUIManager : UIManager
     private void StartQualification() {
         CreateQualificationList();
         competitionState = QUALIFICATION_ROUND;
-        currentContextResults = qualificationsResults;
-        currentContextSeriesCount = qualificationSeriesCount;
+        currentContextResults = competition.GetQualificationList();
+        currentContextSeriesCount = competition.GetQualificationSeriesCount();
     }
 
     private void StartCompetition() {
@@ -247,10 +192,9 @@ public class CompetitionUIManager : UIManager
         FadeResultRecords(50);
         ResetNextJumperPointer();
         currentSerie = 1;
-        currentContextResults = competitionResults;
-        currentContextSeriesCount = competitionSeriesCount;
+        currentContextResults = competition.GetRoundList(1);
+        currentContextSeriesCount = competition.GetCompetitionSeriesCount();
         RenderResultList();
-        Debug.Log("currentJumper pointer przed 1 seria: " + currentJumper);
     }
 
     private void StartNextCompetitionRound() {
@@ -259,13 +203,11 @@ public class CompetitionUIManager : UIManager
         FadeResultRecords(30);
         ResetNextJumperPointer();
         RenderResultList();
-
-        for (int index = 0; index < competitionResultRecords.Count; index++) {
-            Debug.Log((index + 1) + " - " + competitionResultRecords[index].faded);
-        }
-        Debug.Log("currentJumper pointer przed 2 seria: " + currentJumper);
     }
 
+    /*
+        Metoda podpieta pod przycisk w prefabie JumpUI w scenie Competition
+    */
     public void RunSimulation() {
         if (roundState == COMPUTER_NEXT) {
             StartCoroutine(SimulateComputerJump());
@@ -415,26 +357,18 @@ public class CompetitionUIManager : UIManager
     }
 
     private void CreateQualificationList() {
-        InitCompetitionList(skiJumpersList, qualificationsResults, qualificationSeriesCount);
-        CopyList(qualificationsResults, startList);
+        List<CompetitionResult> qualificationList = competition.GetQualificationList();
+        ListUtils.CopyList(qualificationList, startList);
     }
 
     private void CreateCompetitionList() {
-        int qualifiedSkiJumpersCount = qualificationsResults.Count < 50 ? qualificationsResults.Count : 50;
-        List<CompetitionResult> qualifiedSkiJumpersResults = qualificationsResults.GetRange(0, qualifiedSkiJumpersCount);        
-        qualifiedSkiJumpersResults.Sort(CompetitionResult.Compare);
-        qualifiedSkiJumpersResults.Reverse();
-        skiJumpersList = qualifiedSkiJumpersResults.Select(cr => cr.skiJumper).ToList();
-        InitCompetitionList(skiJumpersList, competitionResults, competitionSeriesCount);
-        CopyList(competitionResults, startList);
+        List<CompetitionResult> firstRoundList = competition.GetRoundList(1);
+        ListUtils.CopyList(firstRoundList, startList);
     }
 
-    private void CreateSecondRoundCompetitionList() {
-        competitionResults.Sort(CompetitionResult.Compare);
-        int secondRoundJumpersCount = competitionResults.Count < 30 ? qualificationsResults.Count : 30; 
-        List<CompetitionResult> secondRoundResults = competitionResults.GetRange(0, secondRoundJumpersCount);
-        CopyList(secondRoundResults, startList);
-
+    private void CreateSecondRoundCompetitionList() { 
+        List<CompetitionResult> secondRoundList = competition.GetRoundList(2);
+        ListUtils.CopyList(secondRoundList, startList);
         startList.Reverse();
     }
     private void ResetNextJumperPointer() {
