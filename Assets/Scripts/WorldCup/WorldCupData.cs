@@ -11,7 +11,7 @@ public static class WorldCupData
         15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
     };
 
-    public static List<WorldCupCompetition> worldCupCompetitions;
+    public static List<ICompetition> worldCupCompetitions;
     public static List<SkiJumper> worldCupParticipants;
 
     public static List<WorldCupSkiJumperResult> worldCupClassification;
@@ -34,13 +34,21 @@ public static class WorldCupData
             worldCupClassification.Add(new WorldCupSkiJumperResult(skiJumper));
         }
 
-        worldCupCompetitions = new List<WorldCupCompetition>();
+        /* worldCupCompetitions = new List<WorldCupCompetition>();
         worldCupCompetitions.Add(new WorldCupCompetition("Normal-HS98"));
         worldCupCompetitions.Add(new WorldCupCompetition("Large-HS140"));
-        worldCupCompetitions.Add(new WorldCupCompetition("Fly-HS215"));
+        worldCupCompetitions.Add(new WorldCupCompetition("Fly-HS215")); */
     }
 
-    public static WorldCupCompetition GetCurrentCompetition() {
+    // Zwraca liste wszystkich zawodnikow bioracych udzial w pucharze swiata
+    // posortowana wg zdobytych punktow w klasyfikacji generalnej
+    public static List<SkiJumper> GetWorldCupParticipants() {
+        return worldCupClassification.OrderBy(wcsjr => wcsjr.points)
+                                    .Select(wcsjr => wcsjr.skiJumper)
+                                    .ToList();
+    }
+
+    public static ICompetition GetCurrentCompetition() {
         return worldCupCompetitions[currentCompetition];
     }
 
@@ -49,9 +57,10 @@ public static class WorldCupData
     }
 
     public static void FinishCompetition(List<CompetitionResult> competitionResults) {        
-        worldCupCompetitions[currentCompetition].completed = true;
+        // worldCupCompetitions[currentCompetition].completed = true;
+        worldCupCompetitions[currentCompetition].Complete();
 
-        worldCupCompetitions[currentCompetition].SetResults(competitionResults);
+        // worldCupCompetitions[currentCompetition].SetResults(competitionResults);
 
         for (int index = 0; index < 30; index++) {
             int pointsToAdd = pointsMatrix[index];

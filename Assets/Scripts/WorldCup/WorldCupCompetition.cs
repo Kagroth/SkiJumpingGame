@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+    do usuniecia i zastapienia przez ICompetition
+*/
+
 public class WorldCupCompetition
 {
     public string hillName;
