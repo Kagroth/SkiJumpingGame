@@ -42,6 +42,8 @@ public class CompetitionUIManager : UIManager
 
     // ************************************
 
+    public ICompetition competition;
+
     // Competition Info UI
 
     public Text hillName;
@@ -77,8 +79,6 @@ public class CompetitionUIManager : UIManager
 
     private string competitionState;
 
-    private IEnumerator computerPlayerSimulationCoroutine;
-
     private const string QUALIFICATION_ROUND = "QUALIFICATION"; 
     private const string COMPETITION_ROUND = "COMPETITION_ROUND";
 
@@ -109,7 +109,15 @@ public class CompetitionUIManager : UIManager
         else {
             skiJumpersList = SkiJumperDatabase.LoadSkiJumpers();
         }
-
+        
+        // ******************************************************************
+        competition = WorldCupData.GetCurrentCompetition();
+        competition.SetCompetitionParticipants(WorldCupData.GetWorldCupParticipants());
+        competition.StartQualification();
+        CreateCompetitionResultRecords();
+        RenderResultList();
+        NextState();
+        // ******************************************************************
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         
