@@ -4,7 +4,13 @@ using UnityEngine;
 
 public interface ICompetition {
 
+    int GetQualificationSeriesCount();
+    int GetCompetitionSeriesCount();
     void SetCompetitionParticipants(List<SkiJumper> skiJumpers);
+    
+    List<CompetitionResult> GetQualificationList();
+    List<CompetitionResult> GetRoundList(int round);
+
     void StartQualification();
     void EndQualification();
 

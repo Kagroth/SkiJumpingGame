@@ -8,33 +8,23 @@ public class NormalCompetition : ICompetition
 
     public bool completed;
 
-    public int currentJumperIndex;
+    private int qualificationSeriesCont;
+    private int competitionSeriesCount;
 
-    public int currentSerie;
-    public int qualificationSeriesCont;
-    public int competitionSeriesCount;
-
-    public List<CompetitionResult> startList;
-    public List<CompetitionResult> currentContextResultsList;
     public List<CompetitionResult> qualificationList;
     public List<CompetitionResult> firstRoundList;
     public List<CompetitionResult> secondRoundList;
     public List<CompetitionResult> finalResults; 
 
     public NormalCompetition() {
-        startList = new List<CompetitionResult>();
         qualificationList = new List<CompetitionResult>();
+        firstRoundList = new List<CompetitionResult>();
+        secondRoundList = new List<CompetitionResult>();
+        finalResults = new List<CompetitionResult>();
     }
 
-    public NormalCompetition(HillData hd) {
+    public NormalCompetition(HillData hd) : this() {
         hillData = hd;
-    }
-    private void CopyList(List<CompetitionResult> sourceList, List<CompetitionResult> destinationList) {
-        destinationList.Clear();
-
-        foreach (CompetitionResult cr in sourceList) {
-            destinationList.Add(cr);
-        }
     }
 
     public void SetCompetitionParticipants(List<SkiJumper> skiJumpers) {
@@ -43,23 +33,45 @@ public class NormalCompetition : ICompetition
         }
     }
 
+    public int GetQualificationSeriesCount() {
+        return qualificationSeriesCont;
+    }
+    
+    public int GetCompetitionSeriesCount() {
+        return competitionSeriesCount;
+    }
+
+    public List<CompetitionResult> GetQualificationList() {
+        return qualificationList;
+    }
+
+    public List<CompetitionResult> GetRoundList(int round) {
+        if (round == 1) {
+            return firstRoundList;
+        }
+        else if (round == 2) {
+            return secondRoundList;
+        }
+        else {
+            return null;
+        }
+    }
+
     public void StartQualification() {
-        currentJumperIndex = 0;
-        CopyList(qualificationList, startList);
-        currentContextResultsList = qualificationList;
+
     }
 
     public void EndQualification() {
         qualificationList.Sort(CompetitionResult.Compare);
-        firstRoundList = qualificationList.GetRange(0, 50);
-        CopyList(firstRoundList, startList);
-        currentContextResultsList = firstRoundList;
+        int qualifiedSkiJumpersCount = qualificationList.Count < 50 ? qualificationList.Count : 50;
+        firstRoundList = qualificationList.GetRange(0, qualifiedSkiJumpersCount);
+        firstRoundList.Reverse();
     }
 
     public void EndFirstRound() {
         firstRoundList.Sort(CompetitionResult.Compare);
-        secondRoundList = firstRoundList.GetRange(0, 30);
-        currentContextResultsList = secondRoundList;
+        int secondRoundJumpersCount = firstRoundList.Count < 30 ? firstRoundList.Count : 30; 
+        secondRoundList = firstRoundList.GetRange(0, secondRoundJumpersCount);        
     }
 
     public void StartRound() {
@@ -71,11 +83,7 @@ public class NormalCompetition : ICompetition
     }
 
     public void NextJumper() {
-        currentJumperIndex++;
-    }
 
-    public void SetJumpResult(JumpResult jumpResult) {
-        startList[currentJumperIndex].SetJumpResult(jumpResult, currentSerie);
     }
 
     public void Complete() {
