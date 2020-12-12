@@ -7,79 +7,48 @@ using System.Linq;
 public class CompetitionUIManager : UIManager
 {
     public View[] views;
-
     private View currentView;
-
     private SkiJumperSimulator skiJumperSimulator;
 
     // Competition View UI
-    [SerializeField]
-    private GameObject jumpResultPanel;
-    
-    [SerializeField]
-    private Text distanceValue;
+    [SerializeField] private GameObject jumpResultPanel;
 
-    [SerializeField]
-    private Text jumpPoints;
-
-    [SerializeField]
-    private Text resultPoints;
-
-    [SerializeField]
-    private Text[] judgePoints; 
-
-    [SerializeField]
-    private Text position;
-
+    [SerializeField] private Text distanceValue;
+    [SerializeField] private Text jumpPoints;
+    [SerializeField] private Text resultPoints;
+    [SerializeField] private Text[] judgePoints; 
+    [SerializeField] private Text position;
     private bool helpPanelShow;
 
-    [SerializeField]
-    private GameObject helpPanel;
-    
-    [SerializeField]
-    public GameObject gameplayPanel;
+    [SerializeField] private GameObject helpPanel;
+    [SerializeField] public GameObject gameplayPanel;
     private WindMeterUI windMeter;
 
     // ************************************
-
     public ICompetition competition;
 
     // Competition Info UI
-
     public Text hillName;
     public GameObject resultsScrollPanelContent;
-
     public GameObject competitionScrollPanelRecordPrefab;
     private List<GameObject> competitionScrollPanelRecords;
     private List<CompetitionResultRecord> competitionResultRecords; 
     // *************************************************
     
     // Ski Jumpers Lists
-
     private List<CompetitionResult> currentContextResults;
-
     private List<CompetitionResult> startList;
-
     private PlayerController playerController;
-
     private int currentContextSeriesCount;
-
     private bool playerNextMove;
-    
     private int jumperPointerMoveDirection;
     private int currentJumper;
     private int currentSerie;
     private int completedJumps;
-
     private string competitionState;
-
     private const string QUALIFICATION_ROUND = "QUALIFICATION"; 
     private const string COMPETITION_ROUND = "COMPETITION_ROUND";
-
-    private const string COMPETITION_END = "COMPETITION_END"; 
-
     private string roundState;
-    
     private const string COMPUTER_NEXT = "COMPUTER_NEXT";
     private const string PLAYER_NEXT = "PLAYER_NEXT";
     private const string END_NEXT = "END_NEXT";
@@ -97,9 +66,8 @@ public class CompetitionUIManager : UIManager
         // ******************************************************************
         competition = WorldCupData.GetCurrentCompetition();
         competition.SetCompetitionParticipants(WorldCupData.GetWorldCupParticipants());
-        CreateCompetitionResultRecords();
-        RenderResultList();
-        NextState();
+        Debug.Log("WorldCup participants count: " + WorldCupData.GetWorldCupParticipants().Count);
+        Debug.Log("Current competition participants count: " + competition.GetQualificationList().Count);
         // ******************************************************************
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
@@ -329,10 +297,6 @@ public class CompetitionUIManager : UIManager
             competitionResultRecords[index].SetFade(true);
             competitionResultRecords[index].Render();
         }
-
-        for (int index = 0; index < competitionResultRecords.Count; index++) {
-            Debug.Log((index + 1) + " - " + competitionResultRecords[index].faded);
-        }
     }
 
     public void RenderResultList() {
@@ -383,7 +347,6 @@ public class CompetitionUIManager : UIManager
         currentContextResults.Sort(CompetitionResult.Compare);
     }
     
-    // Update is called once per frame
     void Update()
     {
         if (InputManager.currentInputMode == InputManager.SKI_JUMPER) {
