@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface ICompetition {
-
+    string GetHillName();
     int GetQualificationSeriesCount();
     int GetCompetitionSeriesCount();
     void SetCompetitionParticipants(List<SkiJumper> skiJumpers);
@@ -19,5 +19,6 @@ public interface ICompetition {
     void EndFirstRound();
     void EndRound();
     void Complete();
+    bool IsCompleted();
 }
 

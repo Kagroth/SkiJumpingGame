@@ -21,14 +21,20 @@ public class NormalCompetition : ICompetition
         firstRoundList = new List<CompetitionResult>();
         secondRoundList = new List<CompetitionResult>();
         finalResults = new List<CompetitionResult>();
+        qualificationSeriesCont = 1;
+        competitionSeriesCount = 2;
     }
 
     public NormalCompetition(HillData hd) : this() {
         hillData = hd;
     }
 
+    public string GetHillName() {
+        return hillData.hillName;
+    }
+
     public void SetCompetitionParticipants(List<SkiJumper> skiJumpers) {
-        for (int index = 1; index < skiJumpers.Count; index++) {
+        for (int index = 1; index <= skiJumpers.Count; index++) {
             qualificationList.Add(new CompetitionResult(index, index, skiJumpers[index - 1], qualificationSeriesCont));
         }
     }
@@ -88,5 +94,9 @@ public class NormalCompetition : ICompetition
 
     public void Complete() {
         completed = true;
+    }
+
+    public bool IsCompleted() {
+        return completed;
     }
 }
