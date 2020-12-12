@@ -45,10 +45,10 @@ public class GameManager : MonoBehaviour
             hill = Instantiate(hillPrefab);
             GameObject player = Instantiate(skiJumperPrefab);
             PlayerController pc = player.GetComponent<PlayerController>();
-
+            WorldCupData.PushCompetition(hillData);
         }
         else if (currentScene.Equals("Competition")) {
-            string hillToLoad = WorldCupData.GetCurrentCompetition().hillName;
+            string hillToLoad = WorldCupData.GetCurrentCompetition().GetHillName();
             hillPrefab = Resources.Load<GameObject>("Hills/" + hillToLoad);
             
             hill = Instantiate(hillPrefab);
