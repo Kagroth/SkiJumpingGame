@@ -20,6 +20,13 @@ public static class WorldCupData
 
     public static void CreateRandomCompetition() {
         isRandomCompetition = true;
+        currentCompetition = 0;
+        worldCupParticipants = SkiJumperDatabase.LoadSkiJumpers();
+        worldCupClassification = new List<WorldCupSkiJumperResult>();
+        
+        foreach (SkiJumper skiJumper in worldCupParticipants) {
+            worldCupClassification.Add(new WorldCupSkiJumperResult(skiJumper));
+        }
     }
 
     public static void CreateQuickWorldCup() {
@@ -48,6 +55,14 @@ public static class WorldCupData
                                     .ToList();
     }
 
+    public static void PushCompetition(HillData hillData) {
+        if (worldCupCompetitions == null) {
+            worldCupCompetitions = new List<ICompetition>();
+        }
+
+        worldCupCompetitions.Add(new NormalCompetition(hillData));
+    }
+
     public static ICompetition GetCurrentCompetition() {
         return worldCupCompetitions[currentCompetition];
     }
@@ -57,10 +72,7 @@ public static class WorldCupData
     }
 
     public static void FinishCompetition(List<CompetitionResult> competitionResults) {        
-        // worldCupCompetitions[currentCompetition].completed = true;
         worldCupCompetitions[currentCompetition].Complete();
-
-        // worldCupCompetitions[currentCompetition].SetResults(competitionResults);
 
         for (int index = 0; index < 30; index++) {
             int pointsToAdd = pointsMatrix[index];

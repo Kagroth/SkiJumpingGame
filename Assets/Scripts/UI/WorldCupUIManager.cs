@@ -42,24 +42,24 @@ public class WorldCupUIManager : UIManager
 
         currentCompetition = 0;
         
-        List<WorldCupCompetition> worldCupCompetitions = WorldCupData.worldCupCompetitions;
+        List<ICompetition> worldCupCompetitions = WorldCupData.worldCupCompetitions;
         List<WorldCupSkiJumperResult> worldCupSkiJumperResults = WorldCupData.worldCupClassification;
         
         worldCupSkiJumperResults.Sort(WorldCupSkiJumperResult.Compare);
 
         int index = 1;
 
-        foreach (WorldCupCompetition wcc in worldCupCompetitions) {
+        foreach (ICompetition wcc in worldCupCompetitions) {
             GameObject go = Instantiate(competitionListPanelRecordPrefab, competitionListPanelContent.transform);
             CompetitionListRecord clr = go.GetComponent<CompetitionListRecord>();
-            clr.SetData(index, wcc.hillName, "I");
+            clr.SetData(index, wcc.GetHillName(), "I");
 
-            if (wcc.completed) {
+            if (wcc.IsCompleted()) {
                 clr.Complete();
             }
             else if ((index - 1) == WorldCupData.currentCompetition) {
                 clr.SetColor(Color.yellow);
-                nextCompetitionLabel.text = "Następny konkurs: " + wcc.hillName;
+                nextCompetitionLabel.text = "Następny konkurs: " + wcc.GetHillName();
             }
 
             competitionListRecords.Add(clr);
