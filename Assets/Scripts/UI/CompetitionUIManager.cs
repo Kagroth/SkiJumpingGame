@@ -186,6 +186,7 @@ public class CompetitionUIManager : UIManager
         else if (roundState == END_NEXT) {
             if (competitionState == QUALIFICATION_ROUND && currentSerie == currentContextSeriesCount) {
                 // 1 seria konkursowa
+                competition.EndQualification();
                 StartCompetition();
                 NextState();
             }
@@ -203,6 +204,7 @@ public class CompetitionUIManager : UIManager
                 }
                 else {
                     // 2 seria konkursowa
+                    competition.EndFirstRound();
                     StartNextCompetitionRound();
                     NextState();
                 }
