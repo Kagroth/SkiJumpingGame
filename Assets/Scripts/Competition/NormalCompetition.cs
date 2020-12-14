@@ -70,14 +70,18 @@ public class NormalCompetition : ICompetition
     public void EndQualification() {
         qualificationList.Sort(CompetitionResult.Compare);
         int qualifiedSkiJumpersCount = qualificationList.Count < 50 ? qualificationList.Count : 50;
-        firstRoundList = qualificationList.GetRange(0, qualifiedSkiJumpersCount);
-        firstRoundList.Reverse();
+        List<CompetitionResult> qualifiedJumpers = qualificationList.GetRange(0, qualifiedSkiJumpersCount);
+
+        for (int index = 1; index <= qualifiedSkiJumpersCount; index++) {
+            CompetitionResult competitionResult = new CompetitionResult(index, index, qualifiedJumpers[index - 1].skiJumper, competitionSeriesCount);
+            firstRoundList.Add(competitionResult);
+        }
     }
 
     public void EndFirstRound() {
         firstRoundList.Sort(CompetitionResult.Compare);
         int secondRoundJumpersCount = firstRoundList.Count < 30 ? firstRoundList.Count : 30; 
-        secondRoundList = firstRoundList.GetRange(0, secondRoundJumpersCount);        
+        secondRoundList = firstRoundList.GetRange(0, secondRoundJumpersCount);
     }
 
     public void StartRound() {
