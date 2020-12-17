@@ -14,43 +14,41 @@ public static class WorldCupData
     public static List<ICompetition> worldCupCompetitions;
     public static List<SkiJumper> worldCupParticipants;
 
-    public static List<WorldCupSkiJumperResult> worldCupClassification;
+    public static WorldCupClassification worldCupClassification;
 
     public static int currentCompetition;
 
-    public static void CreateRandomCompetition() {
-        isRandomCompetition = true;
+    public static void CreateWorldCup() {
         currentCompetition = 0;
         worldCupParticipants = SkiJumperDatabase.LoadSkiJumpers();
-        worldCupClassification = new List<WorldCupSkiJumperResult>();
-        
-        foreach (SkiJumper skiJumper in worldCupParticipants) {
-            worldCupClassification.Add(new WorldCupSkiJumperResult(skiJumper));
-        }
+        worldCupClassification = new WorldCupClassification(worldCupParticipants);
+    }
+    
+    public static void CreateRandomCompetition() {
+        isRandomCompetition = true;
+        CreateWorldCup();
     }
 
     public static void CreateQuickWorldCup() {
         isRandomCompetition = false;
-
-        currentCompetition = 0;
-        SkiJumperDatabase.GenerateSkiJumpersFile();
-        worldCupParticipants = SkiJumperDatabase.LoadSkiJumpers();
-        worldCupClassification = new List<WorldCupSkiJumperResult>();
-
-        foreach (SkiJumper skiJumper in worldCupParticipants) {
-            worldCupClassification.Add(new WorldCupSkiJumperResult(skiJumper));
-        }
-
-        /* worldCupCompetitions = new List<WorldCupCompetition>();
-        worldCupCompetitions.Add(new WorldCupCompetition("Normal-HS98"));
-        worldCupCompetitions.Add(new WorldCupCompetition("Large-HS140"));
-        worldCupCompetitions.Add(new WorldCupCompetition("Fly-HS215")); */
+        CreateWorldCup();
     }
+
+    public static void CreateQuickWorldCup(List<HillData> hills) {
+        CreateQuickWorldCup();
+        
+        worldCupCompetitions = new List<ICompetition>();
+        
+        for (int index = 0; index < 3; index++) {
+            worldCupCompetitions.Add(new NormalCompetition(hills[index]));
+        }
+    }
+
 
     // Zwraca liste wszystkich zawodnikow bioracych udzial w pucharze swiata
     // posortowana wg zdobytych punktow w klasyfikacji generalnej
     public static List<SkiJumper> GetWorldCupParticipants() {
-        return worldCupClassification.OrderBy(wcsjr => wcsjr.points)
+        return worldCupClassification.worldCupList.OrderBy(wcsjr => wcsjr.points)
                                     .Select(wcsjr => wcsjr.skiJumper)
                                     .ToList();
     }
@@ -71,13 +69,14 @@ public static class WorldCupData
         currentCompetition++;
     }
 
+    // do przerobienia - rozne metody zliczania punktow oraz sledzenie roznych klasyfikacji: pś, t4s, pśwl itp
     public static void FinishCompetition(List<CompetitionResult> competitionResults) {        
         worldCupCompetitions[currentCompetition].Complete();
 
         for (int index = 0; index < 30; index++) {
             int pointsToAdd = pointsMatrix[index];
             SkiJumper skiJumperToFind = competitionResults[index].skiJumper;
-            WorldCupSkiJumperResult wcsjr = worldCupClassification.Where(wcc => wcc.skiJumper.Equals(skiJumperToFind)).First();
+            WorldCupSkiJumperResult wcsjr = worldCupClassification.worldCupList.Where(wcc => wcc.skiJumper.Equals(skiJumperToFind)).First();
             wcsjr.points += pointsToAdd;
             Debug.Log("Punkty skoczka " + wcsjr.skiJumper.skiJumperName + " po konkursie: " + wcsjr.points);
         }
