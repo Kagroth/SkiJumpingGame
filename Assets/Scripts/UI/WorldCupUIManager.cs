@@ -29,7 +29,6 @@ public class WorldCupUIManager : UIManager
 
     public override void Init()
     {
-        base.Init();
         // temporary
         // WorldCupData.CreateQuickWorldCup();
         // *********
@@ -43,7 +42,7 @@ public class WorldCupUIManager : UIManager
         currentCompetition = 0;
         
         List<ICompetition> worldCupCompetitions = WorldCupData.worldCupCompetitions;
-        List<WorldCupSkiJumperResult> worldCupSkiJumperResults = WorldCupData.worldCupClassification;
+        List<WorldCupSkiJumperResult> worldCupSkiJumperResults = WorldCupData.worldCupClassification.worldCupList;
         
         worldCupSkiJumperResults.Sort(WorldCupSkiJumperResult.Compare);
 
@@ -84,7 +83,11 @@ public class WorldCupUIManager : UIManager
             playButtonText.text = "Zakończ puchar";
         }
     }
-
+    public override void Init(GameManager gameManager)
+    {
+        base.Init(gameManager);
+        this.Init();
+    }
     public void StartCompetition() {
         if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
             SceneManager.LoadScene("MainMenu");
@@ -93,17 +96,5 @@ public class WorldCupUIManager : UIManager
 
         SceneManager.LoadScene("Competition");
         return;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

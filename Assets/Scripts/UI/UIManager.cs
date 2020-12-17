@@ -9,8 +9,12 @@ public class UIManager : MonoBehaviour
 
     }
     
+    public virtual void Init(GameManager gameManagerToSet) {
+        gameManager = gameManagerToSet;
+    }
+
+    public GameManager gameManager;
     public GameObject hill;
     public Text hillInfo;
-    
     public Text landingType;
 }

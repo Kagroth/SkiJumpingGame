@@ -55,7 +55,6 @@ public class CompetitionUIManager : UIManager
 
     public override void Init()
     {
-        base.Init();
         skiJumperSimulator = new SkiJumperSimulator();
         skiJumperSimulator.SetHill(hill);
         
@@ -87,7 +86,11 @@ public class CompetitionUIManager : UIManager
 
         currentView.Show();
     }
-
+    public override void Init(GameManager gameManager)
+    {
+        base.Init(gameManager);
+        this.Init();
+    }
     public void InitPlayerController() {
         playerController = GameObject.FindObjectOfType<PlayerController>();
         playerController.skiJumperStartJumpHandler    += HideJumpResultPanel;

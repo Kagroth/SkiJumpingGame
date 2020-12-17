@@ -15,6 +15,12 @@ public class MainMenuUIManager : UIManager
         currentView.Show();
     }
 
+    public override void Init(GameManager gameManager)
+    {
+        base.Init(gameManager);
+        this.Init();
+    }
+
     public void SwitchView(string viewToShowName) {
         View viewToShow = views.Where(view => view.name.Equals(viewToShowName)).First();
         currentView.SwitchView(viewToShow);
@@ -27,7 +33,7 @@ public class MainMenuUIManager : UIManager
     }
 
     public void StartQuickWorldCup() {
-        WorldCupData.CreateQuickWorldCup();
+        WorldCupData.CreateQuickWorldCup(gameManager.allHills.ToList());
 
         SceneManager.LoadScene("WorldCup");
     }

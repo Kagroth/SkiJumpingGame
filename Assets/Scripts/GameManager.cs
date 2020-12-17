@@ -65,6 +65,6 @@ public class GameManager : MonoBehaviour
         currentUI = Instantiate(UIToLoad.uiPrefab, Vector3.zero, Quaternion.identity);
         currentUIManager = currentUI.GetComponent<UIManager>();
         currentUIManager.hill = hill;
-        currentUIManager.Init();
+        currentUIManager.Init(this);
     }
 }
