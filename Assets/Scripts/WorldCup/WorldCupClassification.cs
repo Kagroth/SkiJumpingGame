@@ -10,7 +10,9 @@ public class WorldCupClassification
     public List<WorldCupSkiJumperResult> worldCupFlyingList;
     public List<FourHillSkiJumperResult> fourHillTournamentList;
 
-    public WorldCupClassification() {
+    public WorldCupClassification(List<SkiJumper> participantsToSet) {
+        worldCupParticipants = participantsToSet;
+        
         worldCupList = new List<WorldCupSkiJumperResult>();
         worldCupFlyingList = new List<WorldCupSkiJumperResult>();
         fourHillTournamentList = new List<FourHillSkiJumperResult>();
@@ -24,9 +26,5 @@ public class WorldCupClassification
             worldCupFlyingList.Add(flyingResult);
             fourHillTournamentList.Add(fourHillResult);
         }
-    }
-
-    public WorldCupClassification(List<SkiJumper> participantsToSet) : this() {
-        worldCupParticipants = participantsToSet;
     }
 }
