@@ -21,7 +21,7 @@ public abstract class Competition : ICompetition
 
     public void SetCompetitionParticipants(List<SkiJumper> skiJumpers) {
         for (int index = 1; index <= skiJumpers.Count; index++) {
-            qualificationList.Add(new CompetitionResult(index, index, skiJumpers[index - 1], qualificationSeriesCont));
+            qualificationList.Add(new CompetitionResult(index, index, skiJumpers[index - 1], qualificationSeriesCount));
         }
     }
 
