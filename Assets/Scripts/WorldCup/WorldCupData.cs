@@ -40,7 +40,16 @@ public static class WorldCupData
         worldCupCompetitions = new List<ICompetition>();
         
         for (int index = 0; index < 3; index++) {
-            worldCupCompetitions.Add(new NormalCompetition(hills[index]));
+            ICompetition competitionToAdd;
+
+            if (hills[index].kPoint >= 185) {
+                competitionToAdd = new FlyingCompetition(hills[index]);
+            }
+            else {
+                competitionToAdd = new NormalCompetition(hills[index]);
+            }
+
+            worldCupCompetitions.Add(competitionToAdd);
         }
     }
 
