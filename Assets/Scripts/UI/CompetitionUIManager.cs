@@ -77,12 +77,11 @@ public class CompetitionUIManager : UIManager
         InitPlayerController();
 
         currentSerie = 1;
-
         ResetNextJumperPointer();
         StartQualification();
         CreateCompetitionResultRecords();
         RenderResultList();
-        NextState();
+        roundState = NextState();
 
         currentView.Show();
     }
@@ -102,11 +101,11 @@ public class CompetitionUIManager : UIManager
         SetPlayerResult();
         RenderResultList();
 
-        JumpResult jrd = playerController.GetJumpResultData();
+        JumpResult jrd     = playerController.GetJumpResultData();
         distanceValue.text = jrd.jumpDistance.ToString();
-        jumpPoints.text = jrd.jumpPoints.ToString();
-        resultPoints.text = startList[currentJumper].points.ToString();
-        position.text = startList[currentJumper].position.ToString();
+        jumpPoints.text    = jrd.jumpPoints.ToString();
+        resultPoints.text  = startList[currentJumper].points.ToString();
+        position.text      = startList[currentJumper].position.ToString();
 
         for(int index = 0; index < judgePoints.Length; index++) {
             judgePoints[index].text = jrd.judges[index].GetJumpStylePoints().ToString();
@@ -147,8 +146,7 @@ public class CompetitionUIManager : UIManager
         currentView.SwitchView(competitionInfo);
         currentView = competitionInfo;
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
-        NextJumper();
-        NextState();
+        roundState = NextState();
     }
     private void StartQualification() {
         CreateQualificationList();
@@ -180,18 +178,13 @@ public class CompetitionUIManager : UIManager
         Metoda podpieta pod przycisk w prefabie JumpUI w scenie Competition
     */
     public void RunSimulation() {
-        if (roundState == COMPUTER_NEXT) {
-            StartCoroutine(SimulateComputerJump());
-        }
-        else if (roundState == PLAYER_NEXT) {
-            SwitchToCompetition();
-        }
-        else if (roundState == END_NEXT) {
+        if (roundState == END_NEXT) {
+            Debug.Log("Koniec rundy");
             if (competitionState == QUALIFICATION_ROUND && currentSerie == currentContextSeriesCount) {
                 // 1 seria konkursowa
                 competition.EndQualification();
                 StartCompetition();
-                NextState();
+                roundState = NextState();
             }
             else if (competitionState == COMPETITION_ROUND) {
                 if (currentSerie == currentContextSeriesCount) {
@@ -209,29 +202,27 @@ public class CompetitionUIManager : UIManager
                     // 2 seria konkursowa
                     competition.EndFirstRound();
                     StartNextCompetitionRound();
-                    NextState();
+                    roundState = NextState();
                 }
             }
         }
+
+        while (roundState != END_NEXT) {
+            if (roundState == COMPUTER_NEXT) {
+                SimulateCurrentComputerJump();
+            }        
+            else if (roundState == PLAYER_NEXT) {
+                SwitchToCompetition();
+                break;
+            }
+
+            roundState = NextState();
+        }        
     }
 
-
-    public IEnumerator SimulateComputerJump() {
-        JumpResult computerResult;
-
-        while (roundState == COMPUTER_NEXT) {
-            computerResult = skiJumperSimulator.SimulateJump();
-            startList[currentJumper].SetJumpResult(computerResult, currentSerie);
-            currentContextResults.Sort(CompetitionResult.Compare);
-
-            RenderResultList();
-            NextJumper();
-
-            yield return new WaitForSeconds(0.1f);
-            NextState();
-        }
-
-        yield break;  
+    public void SimulateCurrentComputerJump() {
+        JumpResult computerResult = skiJumperSimulator.SimulateJump();
+        startList[currentJumper].SetJumpResult(computerResult, currentSerie);
     }
 
     private void NextJumper() {
@@ -239,7 +230,21 @@ public class CompetitionUIManager : UIManager
         completedJumps++;
     }
 
-    private void NextState() {   
+    private string NextState() {
+        NextJumper();
+
+        if (currentJumper == startList.Count) {
+            return END_NEXT;
+        }
+
+        if (startList[currentJumper].skiJumper.isComputer) {
+            return COMPUTER_NEXT;
+        }
+
+        return PLAYER_NEXT;
+    }
+
+    /* private void NextState() {   
         Text playButtonText = currentView.viewPanel.GetComponentInChildren<Button>().gameObject.GetComponentInChildren<Text>();
         
         if (currentJumper == startList.Count) {
@@ -251,14 +256,13 @@ public class CompetitionUIManager : UIManager
         }    
 
         SetIsPlayerNext();
-
         if (playerNextMove) {
             roundState = PLAYER_NEXT;
             playButtonText.text = "Skacz";
         }
         else {
             roundState = COMPUTER_NEXT;
-            playButtonText.text = "Kontynuuj";
+            // playButtonText.text = "Kontynuuj";
         }
 
         Debug.Log("Current RoundState: " + roundState);
@@ -266,17 +270,7 @@ public class CompetitionUIManager : UIManager
         Debug.Log("Current competition scroll panel records: " + competitionScrollPanelRecords.Count);
         Debug.Log("Current serie: " + currentSerie);
 
-    }
-
-    public void SetIsPlayerNext() {
-        if (startList[currentJumper].skiJumper.isComputer) {
-            playerNextMove = false;
-        }
-        else {
-            playerNextMove = true;
-        }
-    }
-
+    } */
     
     private void CreateCompetitionResultRecords() {
         GameObject record;
@@ -341,7 +335,7 @@ public class CompetitionUIManager : UIManager
         startList.Reverse();
     }
     private void ResetNextJumperPointer() {
-        currentJumper = 0;
+        currentJumper = -1;
         completedJumps = 0;
         jumperPointerMoveDirection = 1;
     }
