@@ -62,12 +62,9 @@ public class CompetitionUIManager : UIManager
         startList                     = new List<CompetitionResult>();
         competitionScrollPanelRecords = new List<GameObject>();
         
-        // ******************************************************************
         competition = WorldCupData.GetCurrentCompetition();
         competition.SetCompetitionParticipants(WorldCupData.GetWorldCupParticipants());
-        Debug.Log("WorldCup participants count: " + WorldCupData.GetWorldCupParticipants().Count);
-        Debug.Log("Current competition participants count: " + competition.GetQualificationList().Count);
-        // ******************************************************************
+
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         
@@ -147,6 +144,9 @@ public class CompetitionUIManager : UIManager
         currentView = competitionInfo;
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         roundState = NextState();
+        if (roundState == COMPUTER_NEXT) {
+            RunSimulation();
+        }
     }
     private void StartQualification() {
         CreateQualificationList();
@@ -174,9 +174,8 @@ public class CompetitionUIManager : UIManager
         RenderResultList();
     }
 
-    /*
-        Metoda podpieta pod przycisk w prefabie JumpUI w scenie Competition
-    */
+    
+    // Metoda podpieta pod przycisk w prefabie JumpUI w scenie Competition   
     public void RunSimulation() {
         if (roundState == END_NEXT) {
             Debug.Log("Koniec rundy");
@@ -185,6 +184,7 @@ public class CompetitionUIManager : UIManager
                 competition.EndQualification();
                 StartCompetition();
                 roundState = NextState();
+                return;
             }
             else if (competitionState == COMPETITION_ROUND) {
                 if (currentSerie == currentContextSeriesCount) {
@@ -203,21 +203,24 @@ public class CompetitionUIManager : UIManager
                     competition.EndFirstRound();
                     StartNextCompetitionRound();
                     roundState = NextState();
+                    return;
                 }
             }
+        }       
+
+        while (roundState == COMPUTER_NEXT) {
+            SimulateCurrentComputerJump();
+            roundState = NextState();
         }
 
-        while (roundState != END_NEXT) {
-            if (roundState == COMPUTER_NEXT) {
-                SimulateCurrentComputerJump();
-            }        
-            else if (roundState == PLAYER_NEXT) {
-                SwitchToCompetition();
-                break;
-            }
-
-            roundState = NextState();
-        }        
+        if (roundState == PLAYER_NEXT) {
+            SwitchToCompetition();
+            return;
+        }
+        else {
+            currentContextResults.Sort(CompetitionResult.Compare);
+            RenderResultList();
+        }
     }
 
     public void SimulateCurrentComputerJump() {
@@ -232,10 +235,15 @@ public class CompetitionUIManager : UIManager
 
     private string NextState() {
         NextJumper();
+        
+        Text playButtonText = currentView.viewPanel.GetComponentInChildren<Button>().gameObject.GetComponentInChildren<Text>();
 
         if (currentJumper == startList.Count) {
+            playButtonText.text = "Zakończ";
             return END_NEXT;
         }
+        
+        playButtonText.text = "Skacz";
 
         if (startList[currentJumper].skiJumper.isComputer) {
             return COMPUTER_NEXT;
@@ -243,34 +251,6 @@ public class CompetitionUIManager : UIManager
 
         return PLAYER_NEXT;
     }
-
-    /* private void NextState() {   
-        Text playButtonText = currentView.viewPanel.GetComponentInChildren<Button>().gameObject.GetComponentInChildren<Text>();
-        
-        if (currentJumper == startList.Count) {
-            Debug.Log("CURRENT JUMPER MADAFAKA " + currentJumper);
-            Debug.Log("Rozmiar listy startowej " + startList.Count);
-            roundState = END_NEXT;
-            playButtonText.text = "Zakończ";
-            return;
-        }    
-
-        SetIsPlayerNext();
-        if (playerNextMove) {
-            roundState = PLAYER_NEXT;
-            playButtonText.text = "Skacz";
-        }
-        else {
-            roundState = COMPUTER_NEXT;
-            // playButtonText.text = "Kontynuuj";
-        }
-
-        Debug.Log("Current RoundState: " + roundState);
-        Debug.Log("Current jumper: " + currentJumper);
-        Debug.Log("Current competition scroll panel records: " + competitionScrollPanelRecords.Count);
-        Debug.Log("Current serie: " + currentSerie);
-
-    } */
     
     private void CreateCompetitionResultRecords() {
         GameObject record;
