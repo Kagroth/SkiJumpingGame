@@ -39,7 +39,6 @@ public class GameManager : MonoBehaviour
 
         if (currentScene.Equals("RandomCompetition")) {
             int hillIndex = Random.Range(0, allHills.Length);
-            Debug.Log("Hill index to load" + hillIndex);
             HillData hillData = allHills[hillIndex];
             hillPrefab = Resources.Load<GameObject>("Hills/" + hillData.name);
             hill = Instantiate(hillPrefab);

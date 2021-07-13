@@ -152,7 +152,7 @@ public class CompetitionUIManager : UIManager
         CreateQualificationList();
         competitionState = QUALIFICATION_ROUND;
         currentContextResults = competition.GetQualificationList();
-        currentContextSeriesCount = competition.GetQualificationSeriesCount();
+        currentContextSeriesCount = 1;
     }
 
     private void StartCompetition() {
@@ -200,7 +200,7 @@ public class CompetitionUIManager : UIManager
                 }
                 else {
                     // 2 seria konkursowa
-                    competition.EndFirstRound();
+                    competition.EndRound(1);
                     StartNextCompetitionRound();
                     roundState = NextState();
                     return;
@@ -225,7 +225,7 @@ public class CompetitionUIManager : UIManager
 
     public void SimulateCurrentComputerJump() {
         JumpResult computerResult = skiJumperSimulator.SimulateJump();
-        startList[currentJumper].SetJumpResult(computerResult, currentSerie);
+        startList[currentJumper].PushJumpResult(computerResult);
     }
 
     private void NextJumper() {
@@ -293,7 +293,7 @@ public class CompetitionUIManager : UIManager
         int index = 1;
 
         foreach(SkiJumper sj in skiJumpersListSource) {
-            CompetitionResult cr = new CompetitionResult(index, index, sj, seriesCount);
+            CompetitionResult cr = new CompetitionResult(index, index, sj);
             outputList.Add(cr);
             index++;
         }
@@ -322,7 +322,7 @@ public class CompetitionUIManager : UIManager
     public void SetPlayerResult() {
         JumpResult jr = playerController.GetJumpResultData();
 
-        startList[currentJumper].SetJumpResult(jr, currentSerie);
+        startList[currentJumper].PushJumpResult(jr);
         currentContextResults.Sort(CompetitionResult.Compare);
     }
     

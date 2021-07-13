@@ -4,12 +4,9 @@ using UnityEngine;
 
 public class NormalCompetition : Competition
 {
-        public NormalCompetition() {
+    public NormalCompetition() {
         qualificationList = new List<CompetitionResult>();
-        firstRoundList = new List<CompetitionResult>();
-        secondRoundList = new List<CompetitionResult>();
-        finalResults = new List<CompetitionResult>();
-        qualificationSeriesCount = 1;
+        results = new List<List<CompetitionResult>>();
         competitionSeriesCount = 2;
     }
 
@@ -21,16 +18,20 @@ public class NormalCompetition : Competition
         qualificationList.Sort(CompetitionResult.Compare);
         int qualifiedSkiJumpersCount = qualificationList.Count < 50 ? qualificationList.Count : 50;
         List<CompetitionResult> qualifiedJumpers = qualificationList.GetRange(0, qualifiedSkiJumpersCount);
+        List<CompetitionResult> firstRoundList = new List<CompetitionResult>();
 
         for (int index = 1; index <= qualifiedSkiJumpersCount; index++) {
-            CompetitionResult competitionResult = new CompetitionResult(index, index, qualifiedJumpers[index - 1].skiJumper, competitionSeriesCount);
+            CompetitionResult competitionResult = new CompetitionResult(index, index, qualifiedJumpers[index - 1].skiJumper);
             firstRoundList.Add(competitionResult);
         }
+
+        results.Add(firstRoundList);
     }
 
-    public override void EndFirstRound() {
-        firstRoundList.Sort(CompetitionResult.Compare);
-        int secondRoundJumpersCount = firstRoundList.Count < 30 ? firstRoundList.Count : 30; 
-        secondRoundList = firstRoundList.GetRange(0, secondRoundJumpersCount);
+    public void EndRound(int roundIndex) {
+        results[roundIndex].Sort(CompetitionResult.Compare);
+        int secondRoundJumpersCount = results[roundIndex].Count < 30 ? results[0].Count : 30; 
+        List<CompetitionResult> secondRoundList = results[roundIndex].GetRange(0, secondRoundJumpersCount);
+        results.Add(secondRoundList);
     }
 }

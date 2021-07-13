@@ -5,36 +5,25 @@ using System.Linq;
 public class CompetitionResult
 {
     public int position;
-
     public int bib;
-
     public SkiJumper skiJumper;
     public List<JumpResult> jumpResults;
     public float points;
-
-    public int seriesCount;
 
     public CompetitionResult() {
 
     }
 
-    public CompetitionResult(int pos, int bibNumer, SkiJumper jumperToSet, int series) {
+    public CompetitionResult(int pos, int bibNumer, SkiJumper jumperToSet) {
         position = pos;
         bib = bibNumer;
         skiJumper = jumperToSet;
         jumpResults = new List<JumpResult>();
         points = 0;
-        seriesCount = series;
-
-        for (int index = 0; index < seriesCount; index++) {
-            jumpResults.Add(new JumpResult());
-        }
     }
 
-    public void SetJumpResult(JumpResult jr, int serie) {
-        jumpResults[serie - 1] = jr;
-
-        points += jr.jumpPoints;
+    public void PushJumpResult(JumpResult jr) {
+        jumpResults.Add(jr);
     }
 
     public static int Compare(CompetitionResult result1, CompetitionResult result2) {

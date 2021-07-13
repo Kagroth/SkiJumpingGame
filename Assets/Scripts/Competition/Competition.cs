@@ -4,16 +4,33 @@ using UnityEngine;
 
 public abstract class Competition : ICompetition
 {
+    /*
+        Zamiast bezposrednio trzymac ResulType w klasie, utworzyc liste atrybutow 
+        odpowiadajacych rodzajom konkursow (normalny, loty, t4s itp), ktore to beda
+        przechowywac ResultType
+    */
     public HillData hillData;
     public bool completed;
-
-    protected int qualificationSeriesCount;
     protected int competitionSeriesCount;
-
     public List<CompetitionResult> qualificationList;
-    public List<CompetitionResult> firstRoundList;
-    public List<CompetitionResult> secondRoundList;
-    public List<CompetitionResult> finalResults;
+
+    /* results contains competition result lists for every round/serie
+    e.g. 
+    Normal Competition / KO Competition would have:
+        List:
+            0 - first serie
+            1 - second (last) serie
+    
+    Flying Championship:
+        List:
+            0 - first serie
+            1 - second serie
+            2 - third serie
+            3 - last serie
+    */
+    public List<List<CompetitionResult>> results;
+
+    public IResultType resultType;
 
     public string GetHillName() {
         return hillData.hillName;
@@ -21,12 +38,8 @@ public abstract class Competition : ICompetition
 
     public void SetCompetitionParticipants(List<SkiJumper> skiJumpers) {
         for (int index = 1; index <= skiJumpers.Count; index++) {
-            qualificationList.Add(new CompetitionResult(index, index, skiJumpers[index - 1], qualificationSeriesCount));
+            qualificationList.Add(new CompetitionResult(index, index, skiJumpers[index - 1]));
         }
-    }
-
-    public int GetQualificationSeriesCount() {
-        return qualificationSeriesCount;
     }
     
     public int GetCompetitionSeriesCount() {
@@ -38,15 +51,16 @@ public abstract class Competition : ICompetition
     }
 
     public List<CompetitionResult> GetRoundList(int round) {
-        if (round == 1) {
-            return firstRoundList;
-        }
-        else if (round == 2) {
-            return secondRoundList;
-        }
-        else {
+        if (round >= results.Count) {
+            Debug.LogError("Too high round value");
             return null;
         }
+
+        return results[round];
+    }
+
+    public IResultType GetResultType() {
+        return resultType;
     }
 
     public void StartQualification() {
@@ -57,15 +71,11 @@ public abstract class Competition : ICompetition
 
     }
 
-    public virtual void EndFirstRound() {
+    public void StartRound(int roundIndex) {
 
     }
 
-    public void StartRound() {
-
-    }
-
-    public void EndRound() {
+    public void EndRound(int roundIndex) {
 
     }
 

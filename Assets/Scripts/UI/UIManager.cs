@@ -5,6 +5,11 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public GameManager gameManager;
+    public GameObject hill;
+    public Text hillInfo;
+    public Text landingType;
+    
     public virtual void Init() {
 
     }
@@ -13,8 +18,5 @@ public class UIManager : MonoBehaviour
         gameManager = gameManagerToSet;
     }
 
-    public GameManager gameManager;
-    public GameObject hill;
-    public Text hillInfo;
-    public Text landingType;
+    
 }
