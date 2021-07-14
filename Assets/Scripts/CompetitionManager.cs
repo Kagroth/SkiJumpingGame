@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
-public class CompetitionUIManager : UIManager
+
+public class CompetitionManager : UIManager
 {
     public View[] views;
     private View currentView;

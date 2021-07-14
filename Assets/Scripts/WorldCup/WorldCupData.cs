@@ -92,4 +92,11 @@ public static class WorldCupData
 
         NextCompetiion();
     }
+
+    public static void ApplyPoints(List<CompetitionResult> competitionResults) {
+        ICompetition currentComp = worldCupCompetitions[currentCompetition];
+        IResultType currentCompResultType = currentComp.GetResultType();
+
+        currentCompResultType.ApplyPoints(worldCupClassification.worldCupList, competitionResults);
+    }
 }
