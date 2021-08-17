@@ -22,10 +22,17 @@ public class GameManager : MonoBehaviour
     public GameObject skiJumperPrefab;
     private GameObject hill;
         
+    private List<SkiJumper> allJumpers;
+
+    private void Awake() {
+        DontDestroyOnLoad(this.gameObject);    
+    }
+
     void Start()
     {
+        allJumpers = SkiJumperDatabase.LoadSkiJumpers();
+        SceneManager.sceneLoaded += InitScene;
         InitScene();
-        LoadSceneUI();
     }
 
     // Update is called once per frame
@@ -37,7 +44,11 @@ public class GameManager : MonoBehaviour
     public void InitScene() {
         string currentScene = SceneManager.GetActiveScene().name;
 
-        if (currentScene.Equals("RandomCompetition")) {
+        if (currentScene.Equals("MainMenu")) {
+            Debug.Log("Main Menu scene loading");
+        }
+        else if (currentScene.Equals("RandomCompetition")) {
+            Debug.Log("Random Competition scene loading");
             int hillIndex = Random.Range(0, allHills.Length);
             HillData hillData = allHills[hillIndex];
             hillPrefab = Resources.Load<GameObject>("Hills/" + hillData.name);
@@ -54,6 +65,13 @@ public class GameManager : MonoBehaviour
             GameObject player = Instantiate(skiJumperPrefab);
             PlayerController pc = player.GetComponent<PlayerController>();
         }
+
+        LoadSceneUI();
+    }
+
+    // method for sceneLoaded event
+    public void InitScene(Scene scene, LoadSceneMode mode) {
+        InitScene();
     }
     
     public void LoadSceneUI() {
