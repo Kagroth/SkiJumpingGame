@@ -24,6 +24,7 @@ public class CompetitionResult
 
     public void PushJumpResult(JumpResult jr) {
         jumpResults.Add(jr);
+        points += jr.jumpPoints;
     }
 
     public static int Compare(CompetitionResult result1, CompetitionResult result2) {

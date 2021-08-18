@@ -26,8 +26,17 @@ public class GameManager : MonoBehaviour
 
     private WorldCupData worldCupData;
 
+    private static GameObject instance;
+
     private void Awake() {
-        DontDestroyOnLoad(this.gameObject);    
+        DontDestroyOnLoad(this.gameObject);
+
+        if (instance == null) {
+            instance = this.gameObject;
+        }
+        else {
+            Destroy(this.gameObject);
+        }
     }
 
     void Start()
@@ -71,6 +80,12 @@ public class GameManager : MonoBehaviour
             hill = Instantiate(hillPrefab);
             GameObject player = Instantiate(skiJumperPrefab);
             PlayerController pc = player.GetComponent<PlayerController>();
+        }
+        else if (currentScene.Equals("WorldCup")) {
+            if (worldCupData == null) {
+                worldCupData = new WorldCupData(allJumpers);
+                worldCupData.CreateQuickWorldCup(this.allHills.ToList());
+            }
         }
 
         LoadSceneUI();

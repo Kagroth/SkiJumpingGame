@@ -43,8 +43,6 @@ public class FlyingState : SkiJumperState
     {
         base.HandleUpdate();
         if (isAnimationEnter) {
-            Debug.Log("Animacja runningUp -> flying");
-
             if (Mathf.Abs(playerController.GetFeetBone().localEulerAngles.z - 45) > 1f)
             {
                 playerController.GetFeetBone().localRotation = Quaternion.Euler(playerController.GetFeetBone().localEulerAngles + Vector3.forward * Time.deltaTime);
@@ -72,8 +70,6 @@ public class FlyingState : SkiJumperState
         }
         else 
         {
-            Debug.Log("Flying, mozna kontrolowac skoczka");
-
             float axisY = Input.GetAxisRaw("Mouse Y");
             float axisX = Input.GetAxis("Horizontal");
 

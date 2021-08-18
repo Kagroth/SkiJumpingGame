@@ -25,15 +25,13 @@ public class WorldCupUIManager : UIManager
 
     // *********************************************************
 
+    private WorldCupData worldCupData;
+
     private int currentCompetition;
 
     public override void Init()
-    {
-        // temporary
-        // WorldCupData.CreateQuickWorldCup();
-        // *********
-        
-        /* competitionListPanelRecords = new List<GameObject>();
+    {        
+        competitionListPanelRecords = new List<GameObject>();
         competitionListRecords = new List<CompetitionListRecord>();
 
         classificationListPanelRecords = new List<GameObject>();
@@ -41,8 +39,8 @@ public class WorldCupUIManager : UIManager
 
         currentCompetition = 0;
         
-        List<ICompetition> worldCupCompetitions = WorldCupData.worldCupCompetitions;
-        List<WorldCupSkiJumperResult> worldCupSkiJumperResults = WorldCupData.worldCupClassification.worldCupList;
+        List<ICompetition> worldCupCompetitions = worldCupData.worldCupCompetitions;
+        List<WorldCupSkiJumperResult> worldCupSkiJumperResults = worldCupData.worldCupClassification.worldCupList;
         
         worldCupSkiJumperResults.Sort(WorldCupSkiJumperResult.Compare);
 
@@ -56,7 +54,7 @@ public class WorldCupUIManager : UIManager
             if (wcc.IsCompleted()) {
                 clr.Complete();
             }
-            else if ((index - 1) == WorldCupData.currentCompetition) {
+            else if ((index - 1) == worldCupData.currentCompetition) {
                 clr.SetColor(Color.yellow);
                 nextCompetitionLabel.text = "Następny konkurs: " + wcc.GetHillName();
             }
@@ -78,23 +76,24 @@ public class WorldCupUIManager : UIManager
             index++;
         }
 
-        if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
+        if (worldCupData.currentCompetition == worldCupData.worldCupCompetitions.Count) {
             Text playButtonText = nextCompetitionButton.GetComponentInChildren<Text>();
             playButtonText.text = "Zakończ puchar";
-        } */
+        }
     }
     public override void Init(GameManager gameManager)
     {
-        /* base.Init(gameManager);
-        this.Init(); */
+        worldCupData = gameManager.GetWorldCupData();
+        base.Init(gameManager);
+        this.Init();
     }
     public void StartCompetition() {
-        /* if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
+        if (worldCupData.currentCompetition == worldCupData.worldCupCompetitions.Count) {
             SceneManager.LoadScene("MainMenu");
             return;
         }
 
         SceneManager.LoadScene("Competition");
-        return; */
+        return;
     }
 }

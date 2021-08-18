@@ -13,7 +13,6 @@ public class CompetitionManager : UIManager
 
     // Competition View UI
     [SerializeField] private GameObject jumpResultPanel;
-
     [SerializeField] private Text distanceValue;
     [SerializeField] private Text jumpPoints;
     [SerializeField] private Text resultPoints;
@@ -74,10 +73,8 @@ public class CompetitionManager : UIManager
         HideJumpResultPanel();
         helpPanelShow = false;
         
-        InitPlayerController();
+        // InitPlayerController();
 
-        currentSerie = 1;
-        ResetNextJumperPointer();
         StartQualification();
         CreateCompetitionResultRecords();
         RenderResultList();
@@ -148,8 +145,6 @@ public class CompetitionManager : UIManager
         currentView = competitionInfo;
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         roundState = NextState();
-        currentContextResults.Sort(CompetitionResult.Compare);
-        RenderResultList();
         
         if (roundState == COMPUTER_NEXT) {
             RunSimulation();
@@ -159,42 +154,51 @@ public class CompetitionManager : UIManager
         CreateQualificationList();
         competitionState = QUALIFICATION_ROUND;
         currentContextResults = competition.GetQualificationList();
-        currentContextSeriesCount = 1;
+        currentContextSeriesCount = 0;
+        ResetNextJumperPointer();
     }
 
     private void StartCompetition() {
         competitionState = COMPETITION_ROUND;
-        CreateCompetitionList();
+        CreateRoundList(0);
         FadeResultRecords(50);
         ResetNextJumperPointer();
-        currentSerie = 1;
-        currentContextResults = competition.GetRoundList(1);
+        currentSerie = 0;
+        currentContextResults = competition.GetRoundList(0);
         currentContextSeriesCount = competition.GetCompetitionSeriesCount();
         RenderResultList();
     }
 
     private void StartNextCompetitionRound() {
+        competitionState = COMPETITION_ROUND;
         currentSerie++;
-        CreateSecondRoundCompetitionList();
+        currentContextResults = competition.GetRoundList(currentSerie);
+        CreateRoundListReversed(currentSerie);
         FadeResultRecords(30);
         ResetNextJumperPointer();
         RenderResultList();
     }
-
     
     // Metoda podpieta pod przycisk w prefabie JumpUI w scenie Competition   
     public void RunSimulation() {
+        Debug.Log("Running simulation - Round State: " + roundState + ", Competition State: " + competitionState);
+        Debug.Log("Current serie: " + currentSerie);
+
         if (roundState == END_NEXT) {
             Debug.Log("Koniec rundy");
-            if (competitionState == QUALIFICATION_ROUND && currentSerie == currentContextSeriesCount) {
+            if (competitionState == QUALIFICATION_ROUND) {
                 // 1 seria konkursowa
+                Debug.Log("Rozpoczynam pierwsza serie");
                 competition.EndQualification();
                 StartCompetition();
                 roundState = NextState();
                 return;
             }
             else if (competitionState == COMPETITION_ROUND) {
-                if (currentSerie == currentContextSeriesCount) {
+                Debug.Log("Current serie: " + currentSerie);
+                Debug.Log("Current series context count: " + currentContextSeriesCount);
+                if (currentSerie >= currentContextSeriesCount - 1) {
+                    Debug.Log("Koniec konkursu");
                     // zakoncz konkurs
                     if (worldCupData.isRandomCompetition) {
                         SceneManager.LoadScene("MainMenu");
@@ -206,9 +210,10 @@ public class CompetitionManager : UIManager
                     return;
                 }
                 else {
-                    // 2 seria konkursowa
-                    competition.EndRound(1);
+                    // nastepna seria seria konkursowa
+                    competition.EndRound(currentSerie);
                     StartNextCompetitionRound();
+                    Debug.Log("Rozpoczynam serie nr " + currentSerie);
                     roundState = NextState();
                     return;
                 }
@@ -219,15 +224,18 @@ public class CompetitionManager : UIManager
             SimulateCurrentComputerJump();
             roundState = NextState();
         }
-
-        if (roundState == PLAYER_NEXT) {
+        
+        currentContextResults.Sort(CompetitionResult.Compare);
+        RenderResultList();
+        
+        /* if (roundState == PLAYER_NEXT) {
             SwitchToCompetition();
             return;
         }
         else {
             currentContextResults.Sort(CompetitionResult.Compare);
             RenderResultList();
-        }
+        } */
     }
 
     public void SimulateCurrentComputerJump() {
@@ -245,18 +253,22 @@ public class CompetitionManager : UIManager
         
         Text playButtonText = currentView.viewPanel.GetComponentInChildren<Button>().gameObject.GetComponentInChildren<Text>();
 
-        if (currentJumper == startList.Count) {
+        if (completedJumps == startList.Count + 1) {
+        // if (currentJumper == startList.Count) {
             playButtonText.text = "Zakończ";
             return END_NEXT;
         }
+        else {
+            return COMPUTER_NEXT;
+        }
         
-        playButtonText.text = "Skacz";
+        // playButtonText.text = "Skacz";
 
-        if (startList[currentJumper].skiJumper.isComputer) {
+        /* if (startList[currentJumper].skiJumper.isComputer) {
             return COMPUTER_NEXT;
         }
 
-        return PLAYER_NEXT;
+        return PLAYER_NEXT; */
     }
     
     private void CreateCompetitionResultRecords() {
@@ -311,20 +323,27 @@ public class CompetitionManager : UIManager
         ListUtils.CopyList(qualificationList, startList);
     }
 
-    private void CreateCompetitionList() {
-        List<CompetitionResult> firstRoundList = competition.GetRoundList(1);
-        ListUtils.CopyList(firstRoundList, startList);
+    private void CreateRoundList(int round) {
+        List<CompetitionResult> nextRoundList = competition.GetRoundList(round);
+        ListUtils.CopyList(nextRoundList, startList);
     }
-
-    private void CreateSecondRoundCompetitionList() { 
-        List<CompetitionResult> secondRoundList = competition.GetRoundList(2);
-        ListUtils.CopyList(secondRoundList, startList);
+    private void CreateRoundListReversed(int round) {
+        List<CompetitionResult> nextRoundList = competition.GetRoundList(round);
+        ListUtils.CopyList(nextRoundList, startList);
         startList.Reverse();
     }
+
     private void ResetNextJumperPointer() {
-        currentJumper = -1;
         completedJumps = 0;
-        jumperPointerMoveDirection = 1;
+
+        if (competitionState == QUALIFICATION_ROUND || (competitionState == COMPETITION_ROUND && currentSerie == 0)) {
+            currentJumper = -1;
+            jumperPointerMoveDirection = 1;
+        }
+        else {
+            currentJumper = startList.Count;
+            jumperPointerMoveDirection = -1;
+        }
     }
     public void SetPlayerResult() {
         JumpResult jr = playerController.GetJumpResultData();

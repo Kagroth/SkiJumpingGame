@@ -8,6 +8,11 @@ public class NormalCompetition : Competition
         qualificationList = new List<CompetitionResult>();
         results = new List<List<CompetitionResult>>();
         competitionSeriesCount = 2;
+
+        for (int i = 0; i < competitionSeriesCount; i++) {
+            List<CompetitionResult> listCR = new List<CompetitionResult>();
+            results.Add(listCR);
+        }
     }
 
     public NormalCompetition(HillData hd) : this() {
@@ -25,13 +30,27 @@ public class NormalCompetition : Competition
             firstRoundList.Add(competitionResult);
         }
 
-        results.Add(firstRoundList);
+        results[0] = firstRoundList;
     }
 
-    public void EndRound(int roundIndex) {
+    public override void EndRound(int roundIndex) {
+        if (roundIndex >= competitionSeriesCount) {
+            Debug.LogError("RoundIndex higher or equal to competitionSeriesCount \nRoundIndex: " + roundIndex + "\nCompetition Series Count: " + competitionSeriesCount);
+            return;
+        }
+
         results[roundIndex].Sort(CompetitionResult.Compare);
-        int secondRoundJumpersCount = results[roundIndex].Count < 30 ? results[0].Count : 30; 
-        List<CompetitionResult> secondRoundList = results[roundIndex].GetRange(0, secondRoundJumpersCount);
-        results.Add(secondRoundList);
+        int nextRoundJumpersCount = 0;
+        List<CompetitionResult> nextRoundList = null;
+
+        if (roundIndex == 0) {
+            nextRoundJumpersCount = results[roundIndex].Count < 30 ? results[0].Count : 30; 
+        }
+        else {
+            nextRoundJumpersCount = results[roundIndex].Count;
+        }
+
+        nextRoundList = results[roundIndex].GetRange(0, nextRoundJumpersCount);
+        results[roundIndex + 1] = nextRoundList;
     }
 }

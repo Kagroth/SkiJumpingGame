@@ -57,7 +57,7 @@ public class WorldCupData
             ICompetition competitionToAdd;
 
             if (hills[index].kPoint >= 185) {
-                competitionToAdd = new FlyingCompetition(hills[index]);
+                competitionToAdd = new NormalCompetition(hills[index]);
             }
             else {
                 competitionToAdd = new NormalCompetition(hills[index]);

@@ -47,6 +47,7 @@ public class CompetitionResultRecord : MonoBehaviour
             firstJump.text = competitionResult.jumpResults[0].jumpDistance.ToString() + "m";
         }
         else if (competitionResult.jumpResults.Count == 2) {
+            firstJump.text = competitionResult.jumpResults[0].jumpDistance.ToString() + "m";
             secondJump.text = competitionResult.jumpResults[1].jumpDistance.ToString() + "m";
         }
 

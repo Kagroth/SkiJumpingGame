@@ -75,7 +75,7 @@ public abstract class Competition : ICompetition
 
     }
 
-    public void EndRound(int roundIndex) {
+    public virtual void EndRound(int roundIndex) {
 
     }
 
