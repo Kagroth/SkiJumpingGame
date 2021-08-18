@@ -33,7 +33,7 @@ public class WorldCupUIManager : UIManager
         // WorldCupData.CreateQuickWorldCup();
         // *********
         
-        competitionListPanelRecords = new List<GameObject>();
+        /* competitionListPanelRecords = new List<GameObject>();
         competitionListRecords = new List<CompetitionListRecord>();
 
         classificationListPanelRecords = new List<GameObject>();
@@ -81,20 +81,20 @@ public class WorldCupUIManager : UIManager
         if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
             Text playButtonText = nextCompetitionButton.GetComponentInChildren<Text>();
             playButtonText.text = "Zakończ puchar";
-        }
+        } */
     }
     public override void Init(GameManager gameManager)
     {
-        base.Init(gameManager);
-        this.Init();
+        /* base.Init(gameManager);
+        this.Init(); */
     }
     public void StartCompetition() {
-        if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
+        /* if (WorldCupData.currentCompetition == WorldCupData.worldCupCompetitions.Count) {
             SceneManager.LoadScene("MainMenu");
             return;
         }
 
         SceneManager.LoadScene("Competition");
-        return;
+        return; */
     }
 }

@@ -18,7 +18,6 @@ public class CompetitionResultRecord : MonoBehaviour
     public void SetCompetitionResult(CompetitionResult cr) {
         competitionResult = cr;
         bibNumer.text = cr.bib.ToString();
-        Debug.Log("Kraj: " + cr.skiJumper.country);
         countryFlag.sprite = Resources.Load<Sprite>("Sprites/Country Flags/" + cr.skiJumper.country);
     }
 
@@ -36,22 +35,19 @@ public class CompetitionResultRecord : MonoBehaviour
     }
 
     public void Render() {
-
         position.text = competitionResult.position.ToString();
         skiJumperName.text = competitionResult.skiJumper.skiJumperName;
         resultPoints.text = competitionResult.points.ToString();
-        
-        if (competitionResult.jumpResults[0] != null) {
+
+        if (competitionResult.jumpResults.Count == 0) {
+            firstJump.text = "-";
+            secondJump.text = "-";
+        }
+        else if (competitionResult.jumpResults.Count == 1) {
             firstJump.text = competitionResult.jumpResults[0].jumpDistance.ToString() + "m";
         }
-        
-        if (competitionResult.jumpResults.Count == 2) {
-            if (competitionResult.jumpResults[1] != null) {
-                secondJump.text = competitionResult.jumpResults[1].jumpDistance.ToString() + "m";
-            }
-        }
-        else {
-            secondJump.text = "-";
+        else if (competitionResult.jumpResults.Count == 2) {
+            secondJump.text = competitionResult.jumpResults[1].jumpDistance.ToString() + "m";
         }
 
         if (!competitionResult.skiJumper.isComputer) {
@@ -70,7 +66,5 @@ public class CompetitionResultRecord : MonoBehaviour
                 SetColor(Color.black);
             }
         }
-
-        
     }    
 }

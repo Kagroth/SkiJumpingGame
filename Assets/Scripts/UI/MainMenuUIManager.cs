@@ -27,13 +27,19 @@ public class MainMenuUIManager : UIManager
         currentView = viewToShow;
     }
     public void StartRandomCompetition() {
-        WorldCupData.CreateRandomCompetition();
+        // WorldCupData.CreateRandomCompetition();
         
         SceneManager.LoadScene("RandomCompetition");
     }
 
+    public void StartRandomKOCompetition() {
+        // WorldCupData.CreateRandomCompetition();
+
+        SceneManager.LoadScene("KOCompetition");
+    }
+
     public void StartQuickWorldCup() {
-        WorldCupData.CreateQuickWorldCup(gameManager.allHills.ToList());
+        // WorldCupData.CreateQuickWorldCup(gameManager.allHills.ToList());
 
         SceneManager.LoadScene("WorldCup");
     }

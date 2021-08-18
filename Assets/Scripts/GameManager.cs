@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
         
     private List<SkiJumper> allJumpers;
 
+    private WorldCupData worldCupData;
+
     private void Awake() {
         DontDestroyOnLoad(this.gameObject);    
     }
@@ -49,16 +51,21 @@ public class GameManager : MonoBehaviour
         }
         else if (currentScene.Equals("RandomCompetition")) {
             Debug.Log("Random Competition scene loading");
+
             int hillIndex = Random.Range(0, allHills.Length);
             HillData hillData = allHills[hillIndex];
             hillPrefab = Resources.Load<GameObject>("Hills/" + hillData.name);
             hill = Instantiate(hillPrefab);
+
             GameObject player = Instantiate(skiJumperPrefab);
             PlayerController pc = player.GetComponent<PlayerController>();
-            WorldCupData.PushCompetition(hillData);
+
+            worldCupData = new WorldCupData(allJumpers);
+            worldCupData.SetParticipants(allJumpers);
+            worldCupData.CreateRandomCompetition(hillData);
         }
         else if (currentScene.Equals("Competition")) {
-            string hillToLoad = WorldCupData.GetCurrentCompetition().GetHillName();
+            string hillToLoad = worldCupData.GetCurrentCompetition().GetHillName();
             hillPrefab = Resources.Load<GameObject>("Hills/" + hillToLoad);
             
             hill = Instantiate(hillPrefab);
@@ -83,5 +90,9 @@ public class GameManager : MonoBehaviour
         currentUIManager = currentUI.GetComponent<UIManager>();
         currentUIManager.hill = hill;
         currentUIManager.Init(this);
+    }
+
+    public WorldCupData GetWorldCupData() {
+        return worldCupData;
     }
 }

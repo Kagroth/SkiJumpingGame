@@ -16,10 +16,10 @@ public static class ListUtils
         Debug.Log(listStr);
     }
 
-    public static void CopyList(List<CompetitionResult> sourceList, List<CompetitionResult> destinationList) {
+    public static void CopyList<T>(List<T> sourceList, List<T> destinationList) {
         destinationList.Clear();
 
-        foreach (CompetitionResult cr in sourceList) {
+        foreach (T cr in sourceList) {
             destinationList.Add(cr);
         }
     }

@@ -36,6 +36,8 @@ public class CompetitionManager : UIManager
     private List<CompetitionResultRecord> competitionResultRecords; 
     // *************************************************
     
+    private WorldCupData worldCupData;
+
     // Ski Jumpers Lists
     private List<CompetitionResult> currentContextResults;
     private List<CompetitionResult> startList;
@@ -63,8 +65,8 @@ public class CompetitionManager : UIManager
         startList                     = new List<CompetitionResult>();
         competitionScrollPanelRecords = new List<GameObject>();
         
-        competition = WorldCupData.GetCurrentCompetition();
-        competition.SetCompetitionParticipants(WorldCupData.GetWorldCupParticipants());
+        competition = worldCupData.GetCurrentCompetition();
+        competition.SetCompetitionParticipants(worldCupData.GetWorldCupParticipants());
 
         currentView = views.Where(view => view.name.Equals("CompetitionInfo")).First();
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
@@ -85,6 +87,7 @@ public class CompetitionManager : UIManager
     }
     public override void Init(GameManager gameManager)
     {
+        this.worldCupData = gameManager.GetWorldCupData();
         base.Init(gameManager);
         this.Init();
     }
@@ -145,6 +148,9 @@ public class CompetitionManager : UIManager
         currentView = competitionInfo;
         InputManager.SetInputMode(InputManager.COMPETITION_UI);
         roundState = NextState();
+        currentContextResults.Sort(CompetitionResult.Compare);
+        RenderResultList();
+        
         if (roundState == COMPUTER_NEXT) {
             RunSimulation();
         }
@@ -190,12 +196,12 @@ public class CompetitionManager : UIManager
             else if (competitionState == COMPETITION_ROUND) {
                 if (currentSerie == currentContextSeriesCount) {
                     // zakoncz konkurs
-                    if (WorldCupData.isRandomCompetition) {
+                    if (worldCupData.isRandomCompetition) {
                         SceneManager.LoadScene("MainMenu");
                         return;
                     }
                     
-                    WorldCupData.FinishCompetition(currentContextResults);
+                    worldCupData.FinishCompetition(currentContextResults);
                     SceneManager.LoadScene("WorldCup");
                     return;
                 }

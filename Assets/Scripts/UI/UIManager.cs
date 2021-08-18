@@ -7,8 +7,8 @@ public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
     public GameObject hill;
-    public Text hillInfo;
-    public Text landingType;
+    protected Text hillInfo;
+    protected Text landingType;
     
     public virtual void Init() {
 

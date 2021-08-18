@@ -3,38 +3,52 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public static class WorldCupData
+public class WorldCupData
 {
-    public static bool isRandomCompetition;
-    public static List<int> pointsMatrix = new List<int>() {
+    public bool isRandomCompetition;
+    public List<int> pointsMatrix = new List<int>() {
         100, 80, 60, 50, 45, 40, 36, 32, 29, 26, 24, 22, 20, 18, 16,
         15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
     };
 
-    public static List<ICompetition> worldCupCompetitions;
-    public static List<SkiJumper> worldCupParticipants;
+    public List<ICompetition> worldCupCompetitions;
+    public List<SkiJumper> worldCupParticipants;
 
-    public static WorldCupClassification worldCupClassification;
+    public WorldCupClassification worldCupClassification;
 
-    public static int currentCompetition;
+    public int currentCompetition;
 
-    public static void CreateWorldCup() {
+    public WorldCupData(List<SkiJumper> skiJumpers) {
+        worldCupParticipants = skiJumpers;
+    }
+
+    public void SetParticipants(List<SkiJumper> participants) {
+        worldCupParticipants = new List<SkiJumper>();
+        ListUtils.CopyList(participants, worldCupParticipants);
+    }
+
+    public void CreateWorldCup() {
         currentCompetition = 0;
-        worldCupParticipants = SkiJumperDatabase.LoadSkiJumpers();
+
+        if (worldCupParticipants == null || worldCupParticipants.Count == 0) {
+            worldCupParticipants = SkiJumperDatabase.LoadSkiJumpers();
+        }
+
         worldCupClassification = new WorldCupClassification(worldCupParticipants);
     }
     
-    public static void CreateRandomCompetition() {
+    public void CreateRandomCompetition(HillData hillData) {
         isRandomCompetition = true;
+        PushCompetition(hillData);
         CreateWorldCup();
     }
 
-    public static void CreateQuickWorldCup() {
+    public void CreateQuickWorldCup() {
         isRandomCompetition = false;
         CreateWorldCup();
     }
 
-    public static void CreateQuickWorldCup(List<HillData> hills) {
+    public void CreateQuickWorldCup(List<HillData> hills) {
         CreateQuickWorldCup();
         
         worldCupCompetitions = new List<ICompetition>();
@@ -56,13 +70,13 @@ public static class WorldCupData
 
     // Zwraca liste wszystkich zawodnikow bioracych udzial w pucharze swiata
     // posortowana wg zdobytych punktow w klasyfikacji generalnej
-    public static List<SkiJumper> GetWorldCupParticipants() {
+    public List<SkiJumper> GetWorldCupParticipants() {
         return worldCupClassification.worldCupList.OrderBy(wcsjr => wcsjr.points)
                                     .Select(wcsjr => wcsjr.skiJumper)
                                     .ToList();
     }
 
-    public static void PushCompetition(HillData hillData) {
+    public void PushCompetition(HillData hillData) {
         if (worldCupCompetitions == null) {
             worldCupCompetitions = new List<ICompetition>();
         }
@@ -70,16 +84,16 @@ public static class WorldCupData
         worldCupCompetitions.Add(new NormalCompetition(hillData));
     }
 
-    public static ICompetition GetCurrentCompetition() {
+    public ICompetition GetCurrentCompetition() {
         return worldCupCompetitions[currentCompetition];
     }
 
-    public static void NextCompetiion() {
+    public void NextCompetiion() {
         currentCompetition++;
     }
 
     // do przerobienia - rozne metody zliczania punktow oraz sledzenie roznych klasyfikacji: pś, t4s, pśwl itp
-    public static void FinishCompetition(List<CompetitionResult> competitionResults) {        
+    public void FinishCompetition(List<CompetitionResult> competitionResults) {        
         worldCupCompetitions[currentCompetition].Complete();
 
         for (int index = 0; index < 30; index++) {
@@ -93,7 +107,7 @@ public static class WorldCupData
         NextCompetiion();
     }
 
-    public static void ApplyPoints(List<CompetitionResult> competitionResults) {
+    public void ApplyPoints(List<CompetitionResult> competitionResults) {
         ICompetition currentComp = worldCupCompetitions[currentCompetition];
         IResultType currentCompResultType = currentComp.GetResultType();
 
