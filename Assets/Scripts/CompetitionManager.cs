@@ -239,7 +239,8 @@ public class CompetitionManager : UIManager
     }
 
     public void SimulateCurrentComputerJump() {
-        JumpResult computerResult = skiJumperSimulator.SimulateJump();
+        SkiJumperStats stats = startList[currentJumper].skiJumper.stats;
+        JumpResult computerResult = skiJumperSimulator.SimulateJump(stats);
         startList[currentJumper].PushJumpResult(computerResult);
     }
 

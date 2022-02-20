@@ -9,9 +9,12 @@ public class SkiJumper
     public string country;
     public bool isComputer;
 
-    public SkiJumper(string name, string countryToSet, bool computer) {
+    public SkiJumperStats stats;
+
+    public SkiJumper(string name, string countryToSet, bool computer, SkiJumperStats stats) {
         skiJumperName = name;
         country = countryToSet;
         isComputer = computer;
+        this.stats = stats;
     }
 }

@@ -21,21 +21,36 @@ public class SkiJumperSimulator
         hillIdealTakeOffPoint = GameObject.FindGameObjectWithTag("IdealTakeOffPoint").GetComponent<Transform>();
         windAreas = hill.GetComponentsInChildren<WindArea>();   
     }
+    
+    public JumpResult SimulateJump(SkiJumperStats sjStats) {
+        // new min, new max etc
+        int oldMin = 0;
+        int oldMax = 100;
+        float newMin = -1f;
+        float newMax = 1f;
+        float oldRange = oldMax - oldMin;
+        float newRange = newMax - newMin;
 
-    public JumpResult SimulateJump() {
-        float takeOffStr = maxTakeOffStrength - Random.Range(0, 3f);
-        
-        takeOffStr = Mathf.Clamp(takeOffStr, minTakeOffStrength, maxTakeOffStrength);
+        float skill = sjStats.GetSkill();
 
-        float bodyToSkisTilfCoeff = Random.Range(0.75f, 1f);
-        float skiJumperTiltCoeff = Random.Range(0.75f, 1f);
-        float flightCoeff = bodyToSkisTilfCoeff * skiJumperTiltCoeff;
+        // Base distance calc
+        float skillNormalized = ((skill - oldMin) * newRange) / oldRange + newMin;
+        Debug.Log("Normalized skill: " + skillNormalized);
+        float mean = this.hillData.kPoint + skillNormalized * (this.hillData.hsPoint - this.hillData.kPoint);
+        float std = 3;
+        float baseDistance = RandomNormal.NextFloat(mean, std);
+        Debug.Log("Base distance = " + baseDistance);
 
-        // float jumpCoeff = flightCoeff * takeOffStr;
-        float jumpCoeff = flightCoeff + takeOffStr;
-        jumpCoeff = Mathf.Clamp(jumpCoeff, minTakeOffStrength, maxTakeOffStrength);
-        jumpCoeff = jumpCoeff / maxTakeOffStrength; // normalizacja 
+        // Take off factor calc
+        float skillNorm = skill / 100f;
+        float shiftFromIdealTakeOffPoint = RandomNormal.NextFloat(1 - skillNorm, 1);
+        shiftFromIdealTakeOffPoint = Mathf.Abs(shiftFromIdealTakeOffPoint);
+        float  takeOffCoeff = (this.hillData.hsPoint - this.hillData.kPoint) * 0.2f;
+        float takeOffFactor = (1 - shiftFromIdealTakeOffPoint) * takeOffCoeff; // hs - k * 0.2 is TAKE_OFF_COEFF
+        takeOffFactor = Mathf.Clamp(takeOffFactor, -takeOffCoeff, takeOffCoeff);
+        Debug.Log("Take off shift: " + takeOffFactor);
 
+        // Wind factor calc
         float windForce = 0;
 
         foreach(WindArea wa in windAreas) {
@@ -44,52 +59,22 @@ public class SkiJumperSimulator
 
         windForce = windForce / windAreas.Length;
 
-        // (currVal - minVal) / (maxVal - minVal)
-        float windCoeff = (windForce - (-1)) / (3.5f - (-1)); // normalizacja wiatru dla Range(-1, 3.5f) z WindArea
-
-        // jumpCoeff = jumpCoeff + windCoeff;
-
-        float jumpDistance = hillData.hsPoint * jumpCoeff + (hillData.hsPoint - hillData.kPoint) * windCoeff;
-
-        jumpDistance = Mathf.Round(jumpDistance * 100) / 100;
-
-        float decimalPart = jumpDistance % 1;
-        float distanceToAdd = 0;
-
-        if (decimalPart >= 0.75f)
-        {
-            distanceToAdd = 1;
-        }
-        else if (decimalPart < 0.75f && decimalPart >= 0.25f)
-        {
-            distanceToAdd = 0.5f;
-        }
-
-        jumpDistance = Mathf.Floor(jumpDistance);
-        jumpDistance += distanceToAdd;
-
-        /* Debug.Log("TakeOffStr: " + takeOffStr);        
-        Debug.Log("BodyToSkisTiltCoeff: " + bodyToSkisTilfCoeff);
-        Debug.Log("SkiJumperTiltCoeff: " + skiJumperTiltCoeff);
-        Debug.Log("Flight coeff: " + flightCoeff);
-        Debug.Log("Normalized jump coeff: " + jumpCoeff);
-        Debug.Log("Wind coeff: " + windCoeff);
-
-        Debug.Log("HS * jumpCoeff: " + hillData.hsPoint * jumpCoeff);
-        Debug.Log("(HS - K) * windCoeff: " + (hillData.hsPoint - hillData.kPoint) * windCoeff);
-        
-        Debug.Log("Odleglosc: " + jumpDistance); */
-
+        float wind = RandomNormal.NextFloat(windForce, 1);
+        float windCoeff = wind / 4f;
+        float windShift = windCoeff * (this.hillData.hsPoint - this.hillData.kPoint) / 4;
+        float finalDistance = baseDistance + takeOffFactor + windShift;
+        finalDistance = this.RoundJumpDistance(finalDistance);
+        Debug.Log("Final distance: " + finalDistance);
+     
         JumpResult jumpResult = new JumpResult();
-        jumpResult.jumpDistance = jumpDistance;
-        jumpResult.judges = GenerateJudgeNotes(jumpDistance);
+        jumpResult.jumpDistance = finalDistance;
+        jumpResult.judges = GenerateJudgeNotes(finalDistance);
 
         float jumpStylePoints = jumpResult.judges[1].GetJumpStylePoints() + 
                                 jumpResult.judges[2].GetJumpStylePoints() + 
                                 jumpResult.judges[3].GetJumpStylePoints();
-       
-        float distancePoints = CalculateDistancePoints(hillData, jumpDistance);
-
+        
+        float distancePoints = CalculateDistancePoints(hillData, finalDistance);
         jumpResult.jumpPoints = jumpStylePoints + distancePoints;
 
         System.Random rnd = new System.Random();
@@ -98,6 +83,7 @@ public class SkiJumperSimulator
 
         return jumpResult;
     }
+
 
     private bool HasLanded(float jumpDistance, float rand) {
         bool landed = false;
@@ -194,5 +180,30 @@ public class SkiJumperSimulator
         float distancePoints = diff * hillData.pointPerMeter + basePoints;
 
         return distancePoints;
+    }
+
+    /* 
+        Round jump distance to halves.
+        For example:
+        from 128.246324 => 128.0
+        from 219.842100 => 220.0
+        from 96.6490912 => 96.5
+    */
+    private float RoundJumpDistance(float jumpDistance) {
+        jumpDistance = Mathf.Round(jumpDistance * 100) / 100;
+        float decimalPart = jumpDistance % 1;
+        float distanceToAdd = 0;
+
+        if (decimalPart >= 0.75f) {
+            distanceToAdd = 1;
+        }
+        else if (decimalPart < 0.75f && decimalPart >= 0.25f) {
+            distanceToAdd = 0.5f;
+        }
+
+        jumpDistance = Mathf.Floor(jumpDistance);
+        jumpDistance += distanceToAdd;
+
+        return jumpDistance;
     }
 }
